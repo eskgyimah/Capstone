@@ -21,19 +21,27 @@ from matplotlib.backends.backend_pdf import PdfPages
 class UCCProductionConfig:
     def __init__(self):
         self.quality_threshold = int(os.getenv("UCC_QUALITY_THRESHOLD", "97"))
-        self.student_name = os.getenv("UCC_STUDENT_NAME", "")
-        self.student_id = os.getenv("UCC_STUDENT_ID", "")
-        self.student_email = os.getenv("UCC_STUDENT_EMAIL", "")
+        self.student_name = os.getenv("UCC_STUDENT_NAME", "Edward Solomon Kweku Gyimah")
+        self.student_id = os.getenv("UCC_STUDENT_ID", "SE/DAT/24/0007")
+        self.student_email = os.getenv("UCC_STUDENT_EMAIL", "edward.gyimah002@stu.ucc.edu.gh")
         self.institution = os.getenv("UCC_INSTITUTION", "University of Cape Coast")
-        self.department = os.getenv("UCC_DEPARTMENT", "")
-        self.program = os.getenv("UCC_PROGRAM", "")
-        self.project_title = os.getenv("UCC_PROJECT_TITLE", "COVID-19 Bibliometric Analysis at UCC")
+        self.department = os.getenv("UCC_DEPARTMENT", "Department of Data Science and Economic Policy")
+        self.centre = os.getenv("UCC_CENTRE", "Centre for Data Archiving, Management, Analysis and Advocacy")
+        self.program = os.getenv("UCC_PROGRAM", "MSc Social Science Data Management & Analysis")
+        self.project_title = os.getenv("UCC_PROJECT_TITLE", "COVID-19 Bibliometric Analysis Framework")
+        self.project_subtitle = os.getenv("UCC_PROJECT_SUBTITLE", "A Production-Ready System for Academic Research Data Collection")
         self.supervisor = os.getenv("UCC_SUPERVISOR", "")
+        self.submission_date = os.getenv("UCC_SUBMISSION_DATE", "October 2025")
 
-APP_TITLE = "Capstone — UCC Bibliometric System"
+APP_TITLE = "COVID-19 Bibliometric Analysis Framework"
 DEFAULT_DB = os.getenv("BIB_DB") or os.path.join(os.path.dirname(__file__), "covid_bibliometric_ucc.db")
 
-st.set_page_config(page_title=APP_TITLE, layout="wide")
+st.set_page_config(
+    page_title=APP_TITLE,
+    page_icon="🎓",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # -------------------------
 # DB utils
@@ -53,17 +61,28 @@ def ensure_papers_schema(conn):
     CREATE TABLE IF NOT EXISTS papers (
         id INTEGER PRIMARY KEY,
         title TEXT,
+        authors TEXT,
+        abstract TEXT,
         journal TEXT,
-        publication_date TEXT,
-        citations_count INTEGER,
+        publication_date DATE,
+        doi TEXT,
+        pmid TEXT,
+        url TEXT,
+        keywords TEXT,
+        citation_count INTEGER,
         quality_score REAL,
         source_database TEXT,
-        doi TEXT UNIQUE,
-        pmid TEXT UNIQUE,
         publication_type TEXT,
-        authors TEXT
+        created_at TIMESTAMP,
+        updated_at TIMESTAMP
     );
     """)
+    # Create unique indexes on doi and pmid
+    try:
+        conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_papers_doi ON papers(doi);")
+        conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_papers_pmid ON papers(pmid);")
+    except Exception:
+        pass
     conn.commit()
 
 def schema_for(conn, table):
@@ -221,6 +240,46 @@ def to_bibtex(df: pd.DataFrame) -> str:
     return "\n\n".join(entries)
 
 # -------------------------
+# Sidebar: Institution Branding
+# -------------------------
+cfg = UCCProductionConfig()
+
+# Check for logo file
+logo_path = os.path.join(os.path.dirname(__file__), "UCC_Logo.png")
+if os.path.exists(logo_path):
+    st.sidebar.image(logo_path, use_container_width=True)
+
+st.sidebar.markdown(f"""
+### {cfg.institution.upper()}
+
+**{cfg.department}**
+
+*Centre for Data Archiving,
+Management, Analysis
+and Advocacy*
+
+**Programme:**
+{cfg.program}
+
+---
+
+**Project:**
+{cfg.project_title}
+
+*{cfg.project_subtitle}*
+
+**Student:**
+{cfg.student_name}
+
+**ID:** {cfg.student_id}
+📧 {cfg.student_email}
+
+**Submission:** {cfg.submission_date}
+
+---
+""")
+
+# -------------------------
 # Sidebar: DB path
 # -------------------------
 st.sidebar.header("Data Source")
@@ -256,7 +315,7 @@ def render_data_collection():
         m_title  = pick("Title", "title")
         m_journ  = pick("Journal", "journal")
         m_date   = pick("Publication Date (YYYY...)", "publication_date")
-        m_cit    = pick("Citations", "citations_count")
+        m_cit    = pick("Citations", "citation_count")
         m_src    = pick("Source Database", "source_database")
         m_doi    = pick("DOI", "doi")
         m_pmid   = pick("PMID", "pmid")
@@ -269,7 +328,7 @@ def render_data_collection():
             out["title"] = get(m_title)
             out["journal"] = get(m_journ)
             out["publication_date"] = get(m_date)
-            out["citations_count"] = pd.to_numeric(get(m_cit), errors="coerce") if get(m_cit) is not None else None
+            out["citation_count"] = pd.to_numeric(get(m_cit), errors="coerce") if get(m_cit) is not None else None
             out["source_database"] = get(m_src)
             out["doi"] = get(m_doi)
             out["pmid"] = get(m_pmid)
@@ -282,7 +341,7 @@ def render_data_collection():
         st.dataframe(mapped.head(100))
 
         st.subheader("Append/Merge")
-        target = st.text_input("Target table", value="papers")
+        target = st.text_input("Target table", value="papers_deduped")
         use_doi = st.checkbox("Use DOI as merge key", value=True)
         use_pmid = st.checkbox("Use PMID as merge key", value=True)
         if st.button("Append/Merge into DB"):
@@ -306,12 +365,12 @@ def render_data_collection():
                 st.success(f"Append/Merge completed. Processed rows: {total:,}.")
 
     st.divider()
-    st.subheader("Deduplicate FULL 'papers' → new table")
+    st.subheader("Deduplicate FULL 'papers_deduped' → new table")
     new_name = st.text_input("New table name", value="papers_dedup_dc")
     if st.button("Run dedupe (by DOI→PMID→Title)"):
-        full = pd.read_sql_query("SELECT * FROM papers;", conn)
+        full = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
         if full.empty:
-            st.error("No data in 'papers'.")
+            st.error("No data in 'papers_deduped'.")
         else:
             keys = [build_key(r) for _, r in full.iterrows()]
             out = full.assign(_k=keys).drop_duplicates("_k").drop(columns=["_k"])
@@ -330,9 +389,9 @@ def render_data_collection():
 def render_quality():
     st.header("Quality Assessment")
     st.caption("Compute/update quality_score; write back to DB.")
-    df = pd.read_sql_query("SELECT * FROM papers;", conn)
+    df = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
     if df.empty:
-        st.info("No data in 'papers'."); return
+        st.info("No data in 'papers_deduped'."); return
 
     # Basic heuristic scoring
     st.subheader("Quality Model")
@@ -347,7 +406,7 @@ def render_quality():
     else:
         df["year"] = None
     y_now = pd.Timestamp.utcnow().year
-    cit = pd.to_numeric(df.get("citations_count", pd.Series([np.nan]*len(df))), errors="coerce")
+    cit = pd.to_numeric(df.get("citation_count", pd.Series([np.nan]*len(df))), errors="coerce")
     cit_norm = (cit - np.nanmin(cit)) / (np.nanmax(cit) - np.nanmin(cit)) if np.nanmax(cit) != np.nanmin(cit) else 0
     rec = (df["year"].fillna(y_now) - df["year"].fillna(y_now).min()) / max(1, (df["year"].fillna(y_now).max() - df["year"].fillna(y_now).min()))
     score = 100*(w_doi*(df["doi"].notna() & (df["doi"].astype(str)!="")).astype(float)
@@ -362,25 +421,25 @@ def render_quality():
     df["quality_score_new"] = score.round(2)
 
     st.subheader("Preview")
-    cols = [c for c in ["title","journal","publication_date","citations_count","doi","pmid","quality_score","quality_score_new"] if c in df.columns or c=="quality_score_new"]
+    cols = [c for c in ["title","journal","publication_date","citation_count","doi","pmid","quality_score","quality_score_new"] if c in df.columns or c=="quality_score_new"]
     st.dataframe(df[cols].head(200))
 
     if st.button("Write quality_score to DB (UPDATE)"):
         cur = conn.cursor()
         # ensure column exists
         try:
-            cur.execute("ALTER TABLE papers ADD COLUMN quality_score REAL;")
+            cur.execute("ALTER TABLE papers_deduped ADD COLUMN quality_score REAL;")
         except Exception:
             pass
         # update using rowid mapping: safer with primary key id or doi/pmid
         if "id" in df.columns and df["id"].notna().any():
             for _id, val in zip(df["id"], df["quality_score_new"]):
-                cur.execute("UPDATE papers SET quality_score=? WHERE id=?", (float(val) if pd.notna(val) else None, int(_id)))
+                cur.execute("UPDATE papers_deduped SET quality_score=? WHERE id=?", (float(val) if pd.notna(val) else None, int(_id)))
         else:
             # fallback: by doi
             for doi, val in zip(df["doi"], df["quality_score_new"]):
                 if pd.notna(doi) and str(doi).strip():
-                    cur.execute("UPDATE papers SET quality_score=? WHERE doi=?", (float(val) if pd.notna(val) else None, str(doi)))
+                    cur.execute("UPDATE papers_deduped SET quality_score=? WHERE doi=?", (float(val) if pd.notna(val) else None, str(doi)))
         conn.commit()
         st.success("quality_score updated.")
 
@@ -389,15 +448,15 @@ def render_quality():
 # -------------------------
 def render_analysis():
     st.header("Analysis")
-    df = pd.read_sql_query("SELECT * FROM papers;", conn)
+    df = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
     if df.empty:
-        st.info("No data in 'papers'."); return
+        st.info("No data in 'papers_deduped'."); return
 
     if "publication_date" in df.columns:
         df["year"] = df["publication_date"].apply(parse_year)
     else:
         df["year"] = None
-    for col in ["citations_count","quality_score"]:
+    for col in ["citation_count","quality_score"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
@@ -407,7 +466,7 @@ def render_analysis():
         if df["year"].notna().any(): st.metric("Year span", f"{int(df['year'].min())}–{int(df['year'].max())}")
         else: st.metric("Year span", "—")
     with c3:
-        if "citations_count" in df.columns and df["citations_count"].notna().any(): st.metric("Avg citations", f"{df['citations_count'].mean():.1f}")
+        if "citation_count" in df.columns and df["citation_count"].notna().any(): st.metric("Avg citations", f"{df['citation_count'].mean():.1f}")
         else: st.metric("Avg citations", "—")
 
     st.subheader("Publications per Year")
@@ -437,10 +496,18 @@ def render_analysis():
             st.bar_chart(sv.set_index("source_database"))
 
     st.subheader("Top Cited")
-    if "citations_count" in df.columns:
-        topc = df.sort_values("citations_count", ascending=False).head(200)
-        cols = [c for c in ["title","journal","year","citations_count","doi","pmid"] if c in topc.columns]
-        st.dataframe(topc[cols].fillna("").head(200))
+    if "citation_count" in df.columns:
+        # Check if there are any non-zero citations
+        has_citations = df["citation_count"].notna().any() and (df["citation_count"] > 0).any()
+        if has_citations:
+            topc = df.sort_values("citation_count", ascending=False).head(200)
+            cols = [c for c in ["title","journal","year","citation_count","doi","pmid"] if c in topc.columns]
+            st.dataframe(topc[cols].fillna("").head(200))
+        else:
+            st.info("📊 No citation data available. All citation counts are 0 or NULL.")
+            st.caption("💡 To populate citation data: Use the Data Collection page to import CSV files with citation information.")
+    else:
+        st.info("No 'citation_count' column.")
 
 # -------------------------
 # Page: Report Generation
@@ -448,13 +515,13 @@ def render_analysis():
 def render_report():
     st.header("Report Generation")
     st.caption("Generate a multi-page PDF (cover, yearly trend, source mix, top journals, top-cited).")
-    df = pd.read_sql_query("SELECT * FROM papers;", conn)
+    df = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
     if df.empty:
-        st.info("No data in 'papers'."); return
+        st.info("No data in 'papers_deduped'."); return
     if "publication_date" in df.columns:
         df["year"] = df["publication_date"].apply(parse_year)
     else: df["year"] = None
-    for col in ["citations_count","quality_score"]:
+    for col in ["citation_count","quality_score"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
@@ -469,20 +536,29 @@ def render_report():
         with PdfPages(pdf_path) as pdf:
             # Cover
             fig = plt.figure(figsize=(8.27, 11.69)); ax = fig.add_subplot(111); ax.axis('off')
-            ax.set_title("UCC COVID-19 Bibliometric Report", pad=20, fontsize=16, weight='bold')
+            ax.set_title(f"{cfg.project_title}", pad=20, fontsize=18, weight='bold')
             lines = [
-                f"Student: {cfg.student_name or '—'}  •  ID: {cfg.student_id or '—'}",
-                f"Email: {cfg.student_email or '—'}",
-                f"Institution: {cfg.institution or '—'}",
-                f"Department: {cfg.department or '—'}",
-                f"Programme: {cfg.program or '—'}",
-                f"Project Title: {cfg.project_title or '—'}",
-                f"Supervisor: {cfg.supervisor or '—'}",
+                f"{cfg.project_subtitle}",
                 "",
-                f"Records: {len(df):,}",
+                f"{cfg.institution}",
+                f"{cfg.department}",
+                f"{cfg.centre}",
+                "",
+                f"Programme: {cfg.program}",
+                "",
+                f"Student: {cfg.student_name}",
+                f"Student ID: {cfg.student_id}",
+                f"Email: {cfg.student_email}",
+                f"Supervisor: {cfg.supervisor or 'N/A'}",
+                "",
+                f"Submission: {cfg.submission_date}",
+                "",
+                "=" * 60,
+                "",
+                f"Total Records: {len(df):,}",
             ]
             if df["year"].notna().any(): lines.append(f"Year span: {int(df['year'].min())}–{int(df['year'].max())}")
-            if "citations_count" in df.columns and df["citations_count"].notna().any(): lines.append(f"Avg citations: {df['citations_count'].mean():.2f}")
+            if "citation_count" in df.columns and df["citation_count"].notna().any(): lines.append(f"Avg citations: {df['citation_count'].mean():.2f}")
             if "quality_score" in df.columns and df["quality_score"].notna().any(): lines.append(f"Avg quality: {df['quality_score'].mean():.2f} (threshold {cfg.quality_threshold})")
             y = 0.85
             for ln in lines: ax.text(0.02, y, ln, transform=ax.transAxes, fontsize=11, va='top'); y -= 0.05
@@ -508,10 +584,10 @@ def render_report():
                 ax.set_xticklabels(jv.index.astype(str), rotation=45, ha="right"); ax.set_ylabel("Count"); fig.tight_layout()
                 pdf.savefig(fig); plt.close(fig)
 
-            if "citations_count" in df.columns and df["citations_count"].notna().any():
-                topc = df.sort_values("citations_count", ascending=False).head(20)
+            if "citation_count" in df.columns and df["citation_count"].notna().any():
+                topc = df.sort_values("citation_count", ascending=False).head(20)
                 fig = plt.figure(figsize=(8.27, 11.69)); ax = fig.add_subplot(111); ax.axis('off'); ax.set_title("Top 20 by Citations", pad=20)
-                cols = [c for c in ["title","journal","year","citations_count"] if c in topc.columns]
+                cols = [c for c in ["title","journal","year","citation_count"] if c in topc.columns]
                 table_data = [cols] + topc[cols].astype(str).values.tolist()
                 table = ax.table(cellText=table_data, loc='center'); table.auto_set_font_size(False); table.set_fontsize(8); table.scale(1,1.2)
                 pdf.savefig(fig); plt.close(fig)
@@ -530,12 +606,12 @@ def render_orchestrator_dashboard():
     st.header("🧭 Orchestrator Dashboard")
     st.caption("Filter • Explore • Export • Write-backs • Dry-Run • Append/Merge • PDF")
 
-    df = pd.read_sql_query("SELECT * FROM papers;", conn)
+    df = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
     if "publication_date" in df.columns:
         df["year"] = df["publication_date"].apply(parse_year)
     else:
         df["year"] = None
-    for col in ["citations_count","quality_score"]:
+    for col in ["citation_count","quality_score"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
@@ -557,17 +633,23 @@ def render_orchestrator_dashboard():
         sel_sources = []
 
     cit_range = None
-    if "citations_count" in df.columns and df["citations_count"].notna().any():
-        cmin, cmax = int(np.nanmin(df["citations_count"])), int(np.nanmax(df["citations_count"]))
+    if "citation_count" in df.columns and df["citation_count"].notna().any():
+        cmin, cmax = int(np.nanmin(df["citation_count"])), int(np.nanmax(df["citation_count"]))
         cmin = min(cmin, 0); cmax = max(cmax, 0)
-        cit_range = st.sidebar.slider("Citations range", min_value=cmin, max_value=cmax, value=(cmin, cmax))
+        if cmax > cmin:  # Only show slider if there's a range
+            cit_range = st.sidebar.slider("Citations range", min_value=cmin, max_value=cmax, value=(cmin, cmax))
+        else:
+            st.sidebar.info(f"All citation counts are {cmin}")
 
     qual_range = None
     if "quality_score" in df.columns and df["quality_score"].notna().any():
         qmin, qmax = float(np.nanmin(df["quality_score"])), float(np.nanmax(df["quality_score"]))
         qmin = 0.0 if np.isnan(qmin) else float(qmin)
         qmax = 100.0 if np.isnan(qmax) else float(qmax)
-        qual_range = st.sidebar.slider("Quality score range", min_value=float(0.0), max_value=float(100.0), value=(qmin, qmax))
+        if qmax > qmin:  # Only show slider if there's a range
+            qual_range = st.sidebar.slider("Quality score range", min_value=float(0.0), max_value=float(100.0), value=(qmin, qmax))
+        else:
+            st.sidebar.info(f"All quality scores are {qmin:.1f}")
 
     search_text = st.sidebar.text_input("Search title contains", value="")
 
@@ -575,7 +657,7 @@ def render_orchestrator_dashboard():
     if sel_years: f = f[f["year"].isin(sel_years)]
     if sel_journals and "journal" in f.columns: f = f[f["journal"].astype(str).isin(sel_journals)]
     if sel_sources and "source_database" in f.columns: f = f[f["source_database"].astype(str).isin(sel_sources)]
-    if cit_range and "citations_count" in f.columns: f = f[(f["citations_count"].fillna(0)>=cit_range[0]) & (f["citations_count"].fillna(0)<=cit_range[1])]
+    if cit_range and "citation_count" in f.columns: f = f[(f["citation_count"].fillna(0)>=cit_range[0]) & (f["citation_count"].fillna(0)<=cit_range[1])]
     if qual_range and "quality_score" in f.columns: f = f[(f["quality_score"].fillna(0)>=qual_range[0]) & (f["quality_score"].fillna(0)<=qual_range[1])]
     if search_text.strip(): f = f[f["title"].astype(str).str.lower().str.contains(search_text.strip().lower(), na=False)]
 
@@ -586,7 +668,7 @@ def render_orchestrator_dashboard():
         if f["year"].notna().any(): st.metric("Year span", f"{int(f['year'].min())}–{int(f['year'].max())}")
         else: st.metric("Year span", "—")
     with c3:
-        if "citations_count" in f.columns and f["citations_count"].notna().any(): st.metric("Avg citations", f"{f['citations_count'].mean():.1f}")
+        if "citation_count" in f.columns and f["citation_count"].notna().any(): st.metric("Avg citations", f"{f['citation_count'].mean():.1f}")
         else: st.metric("Avg citations", "—")
     with c4:
         if "journal" in f.columns and not f["journal"].isna().all(): st.metric("Top journal", f["journal"].value_counts().idxmax())
@@ -629,11 +711,17 @@ def render_orchestrator_dashboard():
         else: st.info("No 'journal' column.")
 
     with t4:
-        if "citations_count" in f.columns and not f.empty:
-            topc = f.sort_values("citations_count", ascending=False).head(200)
-            cols = [c for c in ["title","journal","year","citations_count","doi","pmid"] if c in topc.columns]
-            st.dataframe(topc[cols].fillna("").head(200))
-        else: st.info("No 'citations_count' column.")
+        if "citation_count" in f.columns and not f.empty:
+            # Check if there are any non-zero citations
+            has_citations = f["citation_count"].notna().any() and (f["citation_count"] > 0).any()
+            if has_citations:
+                topc = f.sort_values("citation_count", ascending=False).head(200)
+                cols = [c for c in ["title","journal","year","citation_count","doi","pmid"] if c in topc.columns]
+                st.dataframe(topc[cols].fillna("").head(200))
+            else:
+                st.info("📊 No citation data available. All citation counts are 0 or NULL.")
+                st.caption("💡 To populate citation data: Use the Data Collection page to import CSV files with citation information.")
+        else: st.info("No 'citation_count' column.")
 
     with t5:
         k = f.apply(lambda r: build_key(r), axis=1)
@@ -643,7 +731,7 @@ def render_orchestrator_dashboard():
 
     with t6:
         st.subheader("Export current filtered set")
-        preview_cols = [c for c in ["title","journal","year","doi","pmid","citations_count","quality_score","source_database"] if c in f.columns]
+        preview_cols = [c for c in ["title","journal","year","doi","pmid","citation_count","quality_score","source_database"] if c in f.columns]
         st.dataframe(f[preview_cols].head(200))
         st.download_button("Download CSV", data=f.to_csv(index=False).encode("utf-8"), file_name="ucc_filtered.csv", mime="text/csv")
         st.download_button("Download RIS", data=to_ris(f).encode("utf-8"), file_name="ucc_filtered.ris", mime="application/x-research-info-systems")
@@ -657,8 +745,8 @@ def render_orchestrator_dashboard():
         with tabA:
             new_name = st.text_input("New table name", value="papers_dedup")
             if st.button("Run dedupe and write", key="dedupe_run"):
-                full = pd.read_sql_query("SELECT * FROM papers;", conn)
-                if full.empty: st.error("No data found in 'papers'.")
+                full = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
+                if full.empty: st.error("No data found in 'papers_deduped'.")
                 else:
                     keys = [build_key(r) for _,r in full.iterrows()]
                     out = full.assign(_k=keys).drop_duplicates("_k").drop(columns=["_k"])
@@ -686,7 +774,7 @@ def render_orchestrator_dashboard():
             thr = st.slider("Quality threshold", min_value=0, max_value=100, value=cfg.quality_threshold, step=1)
             qname = st.text_input("New table name", value=f"papers_quality_ge_{thr}")
             if st.button("Write quality-filtered table", key="quality_run"):
-                full = pd.read_sql_query("SELECT * FROM papers;", conn)
+                full = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
                 if "quality_score" not in full.columns: st.error("No 'quality_score' column found.")
                 else:
                     qdf = full[full["quality_score"].fillna(0) >= thr].copy()
@@ -705,7 +793,7 @@ def render_orchestrator_dashboard():
             thr_prev = st.slider("Quality threshold (for Quality action)", min_value=0, max_value=100, value=97, step=1, key="q_prev")
             if st.button("Generate Preview", key="dry_run_btn"):
                 if action == "Deduplicate FULL":
-                    full = pd.read_sql_query("SELECT * FROM papers;", conn)
+                    full = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
                     if full.empty:
                         st.info("No rows in papers.")
                         dprev = pd.DataFrame()
@@ -715,12 +803,12 @@ def render_orchestrator_dashboard():
                 elif action == "Materialize FILTERED":
                     dprev = f.copy()
                 else:
-                    full = pd.read_sql_query("SELECT * FROM papers;", conn)
+                    full = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
                     if "quality_score" not in full.columns: st.error("No 'quality_score' column found."); dprev = pd.DataFrame()
                     else: dprev = full[full["quality_score"].fillna(0) >= thr_prev].copy()
                 if dprev.empty: st.info("No rows in resulting DataFrame.")
                 else:
-                    sc = schema_for(conn, "papers") or [(c,"TEXT") for c in dprev.columns]
+                    sc = schema_for(conn, "papers_deduped") or [(c,"TEXT") for c in dprev.columns]
                     ordered = [ (c,t) for (c,t) in sc if c in dprev.columns ]
                     for c in dprev.columns:
                         if c not in [x[0] for x in ordered]: ordered.append((c,"TEXT"))
@@ -732,8 +820,8 @@ def render_orchestrator_dashboard():
 
         with tabE:
             st.write("Append/Merge current filtered data into a target table by DOI/PMID (no drop).")
-            target = st.text_input("Target table name", value="papers")
-            create_shell = st.checkbox("Create target table if missing (schema from 'papers')", value=True)
+            target = st.text_input("Target table name", value="papers_deduped")
+            create_shell = st.checkbox("Create target table if missing (schema from 'papers_deduped')", value=True)
             use_doi = "doi" in df.columns and st.checkbox("Use DOI as merge key", value=True)
             use_pmid = "pmid" in df.columns and st.checkbox("Use PMID as merge key", value=True)
             if st.button("Run Append/Merge", key="append_run"):
@@ -772,20 +860,29 @@ def render_orchestrator_dashboard():
             with PdfPages(pdf_path) as pdf:
                 # Cover
                 fig = plt.figure(figsize=(8.27, 11.69)); ax = fig.add_subplot(111); ax.axis('off')
-                ax.set_title("UCC COVID-19 Bibliometric Report", pad=20, fontsize=16, weight='bold')
+                ax.set_title(f"{cfg.project_title}", pad=20, fontsize=18, weight='bold')
                 lines = [
-                    f"Student: {cfg.student_name or '—'}  •  ID: {cfg.student_id or '—'}",
-                    f"Email: {cfg.student_email or '—'}",
-                    f"Institution: {cfg.institution or '—'}",
-                    f"Department: {cfg.department or '—'}",
-                    f"Programme: {cfg.program or '—'}",
-                    f"Project Title: {cfg.project_title or '—'}",
-                    f"Supervisor: {cfg.supervisor or '—'}",
+                    f"{cfg.project_subtitle}",
                     "",
-                    f"Records (filtered): {len(f):,}",
+                    f"{cfg.institution}",
+                    f"{cfg.department}",
+                    f"{cfg.centre}",
+                    "",
+                    f"Programme: {cfg.program}",
+                    "",
+                    f"Student: {cfg.student_name}",
+                    f"Student ID: {cfg.student_id}",
+                    f"Email: {cfg.student_email}",
+                    f"Supervisor: {cfg.supervisor or 'N/A'}",
+                    "",
+                    f"Submission: {cfg.submission_date}",
+                    "",
+                    "=" * 60,
+                    "",
+                    f"Total Records (filtered): {len(f):,}",
                 ]
                 if f["year"].notna().any(): lines.append(f"Year span: {int(f['year'].min())}–{int(f['year'].max())}")
-                if "citations_count" in f.columns and f["citations_count"].notna().any(): lines.append(f"Avg citations: {f['citations_count'].mean():.2f}")
+                if "citation_count" in f.columns and f["citation_count"].notna().any(): lines.append(f"Avg citations: {f['citation_count'].mean():.2f}")
                 if "quality_score" in f.columns and f["quality_score"].notna().any(): lines.append(f"Avg quality: {f['quality_score'].mean():.2f} (threshold {cfg.quality_threshold})")
                 y = 0.85
                 for ln in lines: ax.text(0.02, y, ln, transform=ax.transAxes, fontsize=11, va='top'); y -= 0.05
@@ -811,10 +908,10 @@ def render_orchestrator_dashboard():
                     ax.set_xticklabels(jv.index.astype(str), rotation=45, ha="right"); ax.set_ylabel("Count"); fig.tight_layout()
                     pdf.savefig(fig); plt.close(fig)
 
-                if "citations_count" in f.columns and f["citations_count"].notna().any():
-                    topc = f.sort_values("citations_count", ascending=False).head(20)
+                if "citation_count" in f.columns and f["citation_count"].notna().any():
+                    topc = f.sort_values("citation_count", ascending=False).head(20)
                     fig = plt.figure(figsize=(8.27, 11.69)); ax = fig.add_subplot(111); ax.axis('off'); ax.set_title("Top 20 by Citations", pad=20)
-                    cols = [c for c in ["title","journal","year","citations_count"] if c in topc.columns]
+                    cols = [c for c in ["title","journal","year","citation_count"] if c in topc.columns]
                     table_data = [cols] + topc[cols].astype(str).values.tolist()
                     table = ax.table(cellText=table_data, loc='center'); table.auto_set_font_size(False); table.set_fontsize(8); table.scale(1,1.2)
                     pdf.savefig(fig); plt.close(fig)
@@ -829,18 +926,31 @@ def render_orchestrator_dashboard():
 # Main Router
 # -------------------------
 def main():
-    st.title(APP_TITLE)
-    page = st.sidebar.selectbox("Navigate", ["Data Collection","Quality Assessment","Analysis","Report Generation","Orchestrator Dashboard"])
-    if page == "Data Collection":
-        render_data_collection()
-    elif page == "Quality Assessment":
-        render_quality()
-    elif page == "Analysis":
-        render_analysis()
-    elif page == "Report Generation":
-        render_report()
-    elif page == "Orchestrator Dashboard":
+    st.title(f"🎓 {APP_TITLE}")
+    st.caption(f"{cfg.project_subtitle} | {cfg.institution}")
+    # Enhanced navigation with icons and logical grouping
+    page = st.sidebar.selectbox(
+        "📍 Navigation",
+        [
+            "🧭 Dashboard",
+            "📊 Analysis & Insights",
+            "📁 Data Collection",
+            "✅ Quality Assessment",
+            "📄 Report Generation"
+        ],
+        index=0  # Default to Dashboard
+    )
+
+    if page == "🧭 Dashboard":
         render_orchestrator_dashboard()
+    elif page == "📊 Analysis & Insights":
+        render_analysis()
+    elif page == "📁 Data Collection":
+        render_data_collection()
+    elif page == "✅ Quality Assessment":
+        render_quality()
+    elif page == "📄 Report Generation":
+        render_report()
 
 if __name__ == "__main__":
     main()

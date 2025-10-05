@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environments
+.env
+.venv/
+venv/
+ENV/
+
+# Database files
+*.db
+*.sqlite*
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.claude/
+
+# Reports and outputs
+reports/
+*.png
+*.jpg
+*.jpeg
+output.*
+
+# Data files (CSV)
+*.csv
+
+# Archives
+*.rar
+*.zip
+*.tar.gz
+
+# Backup files
+*_backup*.py
+*_new.py
+production_ucc_system*.py
+ucc_orchestrator_app*.py
+
+# Temporary files
+*.tmp
+*.log
+*.txt
+
+# Keep important docs
+!README.md
+!*_COMPLETE.md
+!*_SUMMARY.md
+!*_APPLIED.md
+!*_IMPROVEMENTS.md
+!UCC_Biblio_README.txt
