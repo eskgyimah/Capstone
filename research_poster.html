@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COVID-19 Bibliometric Analysis Framework - Research Poster</title>
     <style>
-        /* Print-specific settings */
+        /* Print-specific settings - LANDSCAPE BANNER */
         @page {
-            size: A0 portrait; /* 841mm × 1189mm */
+            size: A0 landscape; /* 1189mm × 841mm (Landscape) */
             margin: 0;
         }
 
@@ -18,8 +18,8 @@
             }
 
             .poster {
-                width: 841mm !important;
-                height: 1189mm !important;
+                width: 1189mm !important;
+                height: 841mm !important;
                 max-width: none !important;
                 box-shadow: none !important;
                 margin: 0 !important;
@@ -45,7 +45,7 @@
         }
 
         .poster {
-            width: 841px; /* A0 width scaled for screen (841px = 841mm at 96 DPI) */
+            width: 1400px; /* A0 landscape width scaled for screen */
             max-width: 100%;
             margin: 0 auto;
             background: white;
@@ -100,95 +100,114 @@
             margin-bottom: 5px;
         }
 
-        /* Header */
+        /* Header - COMPACT FOR BANNER */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 40px 50px;
+            padding: 25px 40px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 3em;
-            margin-bottom: 15px;
+            font-size: 2.2em;
+            margin-bottom: 8px;
             font-weight: bold;
         }
 
         .header .subtitle {
-            font-size: 1.5em;
+            font-size: 1.1em;
             opacity: 0.95;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
 
         .header-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 30px;
-            padding-top: 20px;
+            margin-top: 12px;
+            padding-top: 12px;
             border-top: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .author-info {
             text-align: left;
+            font-size: 0.9em;
         }
 
         .institution-info {
             text-align: right;
+            font-size: 0.9em;
         }
 
         .header-info p {
-            font-size: 1.1em;
-            margin: 5px 0;
+            margin: 3px 0;
         }
 
-        /* Main Content */
+        /* Main Content - BANNER LAYOUT */
         .content {
-            padding: 40px 50px;
+            padding: 30px 40px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
         }
 
         .section {
-            margin-bottom: 40px;
+            margin-bottom: 0;
         }
 
         .section-title {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px 25px;
-            font-size: 1.8em;
+            padding: 10px 15px;
+            font-size: 1.3em;
             font-weight: bold;
-            margin-bottom: 20px;
-            border-radius: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
         }
 
         .two-column {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 40px;
+            gap: 20px;
         }
 
         .three-column {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
+            gap: 15px;
+        }
+
+        .four-column-layout {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .span-2 {
+            grid-column: span 2;
         }
 
         .box {
             background: #f8f9fa;
             border-left: 5px solid #667eea;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
+            height: 100%;
         }
 
         .box h3 {
             color: #667eea;
-            font-size: 1.4em;
-            margin-bottom: 15px;
+            font-size: 1.15em;
+            margin-bottom: 10px;
         }
 
         .box p, .box ul {
-            font-size: 1.1em;
-            line-height: 1.8;
+            font-size: 0.95em;
+            line-height: 1.6;
             color: #4a5568;
         }
 
@@ -198,8 +217,8 @@
         }
 
         li {
-            padding: 8px 0;
-            padding-left: 25px;
+            padding: 5px 0;
+            padding-left: 20px;
             position: relative;
         }
 
@@ -209,33 +228,34 @@
             left: 0;
             color: #667eea;
             font-weight: bold;
+            font-size: 0.9em;
         }
 
-        /* Stats boxes */
+        /* Stats boxes - COMPACT */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin: 30px 0;
+            gap: 12px;
+            margin: 15px 0;
         }
 
         .stat-box {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 25px;
-            border-radius: 15px;
+            padding: 15px;
+            border-radius: 10px;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
         .stat-number {
-            font-size: 3em;
+            font-size: 2em;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .stat-label {
-            font-size: 1.1em;
+            font-size: 0.85em;
             opacity: 0.95;
         }
 
@@ -368,17 +388,17 @@
             line-height: 1.6;
         }
 
-        /* Footer */
+        /* Footer - COMPACT */
         .footer {
             background: #2d3748;
             color: white;
-            padding: 25px 50px;
+            padding: 15px 40px;
             text-align: center;
         }
 
         .footer p {
-            font-size: 1.1em;
-            margin: 5px 0;
+            font-size: 0.85em;
+            margin: 3px 0;
         }
 
         /* QR code placeholder */
@@ -431,8 +451,8 @@
         <button class="print-btn" onclick="downloadPDF()" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">📄 Save as PDF</button>
         <div class="size-info">
             <strong>Print Settings:</strong>
-            Paper: A0 (841 × 1189 mm)<br>
-            Orientation: Portrait<br>
+            Paper: A0 (1189 × 841 mm)<br>
+            Orientation: <strong>LANDSCAPE</strong><br>
             Margins: None<br>
             Scale: 100%
         </div>
@@ -466,154 +486,124 @@
             </div>
         </div>
 
-        <!-- Main Content -->
+        <!-- Main Content - BANNER LAYOUT -->
         <div class="content">
-            <!-- Introduction -->
-            <div class="section">
+            <!-- Row 1: Introduction (span 2) + System Overview (span 2) -->
+            <div class="section span-2">
                 <h2 class="section-title">📊 Introduction & Problem Statement</h2>
-                <div class="two-column">
-                    <div class="box">
-                        <h3>Research Challenge</h3>
-                        <p>The COVID-19 pandemic generated unprecedented volumes of scientific literature across multiple databases. Researchers need efficient, automated tools to:</p>
-                        <ul>
-                            <li>Collect data from multiple academic APIs</li>
-                            <li>Deduplicate and clean bibliometric records</li>
-                            <li>Assess publication quality systematically</li>
-                            <li>Generate comprehensive analysis reports</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>Project Objectives</h3>
-                        <ul>
-                            <li>Develop a production-ready web application</li>
-                            <li>Integrate PubMed, CrossRef, and Europe PMC APIs</li>
-                            <li>Implement automated deduplication strategies</li>
-                            <li>Create configurable quality scoring models</li>
-                            <li>Generate publication-ready reports</li>
-                            <li>Deploy with Docker and cloud infrastructure</li>
-                        </ul>
-                    </div>
+                <div class="box">
+                    <h3>Research Challenge</h3>
+                    <p>The COVID-19 pandemic generated unprecedented volumes of scientific literature. Researchers need efficient, automated tools to collect, deduplicate, assess quality, and analyze bibliometric data across multiple academic databases.</p>
+                </div>
+                <div class="box" style="margin-top: 15px;">
+                    <h3>Project Objectives</h3>
+                    <ul>
+                        <li>Integrate PubMed, CrossRef, Europe PMC APIs</li>
+                        <li>Implement hierarchical deduplication</li>
+                        <li>Create quality scoring models</li>
+                        <li>Deploy with Docker and cloud infrastructure</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- System Overview -->
-            <div class="section">
-                <h2 class="section-title">🏗️ System Architecture & Methodology</h2>
-
+            <div class="section span-2">
+                <h2 class="section-title">🏗️ System Architecture</h2>
                 <div class="flow-container">
                     <div class="flow-step">
-                        <h4>1. Data Collection</h4>
-                        <p>CSV Import<br>API Integration</p>
+                        <h4>1. Collect</h4>
+                        <p>CSV/APIs</p>
                     </div>
                     <div class="flow-step">
-                        <h4>2. Processing</h4>
-                        <p>Deduplication<br>Schema Alignment</p>
+                        <h4>2. Process</h4>
+                        <p>Deduplicate</p>
                     </div>
                     <div class="flow-step">
-                        <h4>3. Quality Control</h4>
-                        <p>Scoring<br>Filtering</p>
+                        <h4>3. Score</h4>
+                        <p>Quality</p>
                     </div>
                     <div class="flow-step">
-                        <h4>4. Analysis</h4>
-                        <p>Visualization<br>Statistics</p>
+                        <h4>4. Analyze</h4>
+                        <p>Visualize</p>
                     </div>
                     <div class="flow-step">
                         <h4>5. Export</h4>
-                        <p>Reports<br>Citations</p>
+                        <p>Reports</p>
                     </div>
                 </div>
-
-                <div class="highlight-box">
+                <div class="highlight-box" style="margin-top: 15px;">
                     <h4>Technology Stack</h4>
                     <div class="tech-stack">
                         <span class="tech-badge">Python 3.11</span>
                         <span class="tech-badge">Streamlit</span>
                         <span class="tech-badge">SQLite</span>
                         <span class="tech-badge">Pandas</span>
-                        <span class="tech-badge">Matplotlib</span>
-                        <span class="tech-badge">Plotly</span>
                         <span class="tech-badge">Biopython</span>
                         <span class="tech-badge">Docker</span>
                         <span class="tech-badge">GitHub Actions</span>
-                        <span class="tech-badge">Streamlit Cloud</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Key Features -->
+            <!-- Row 2: Key Features (4 columns) -->
             <div class="section">
-                <h2 class="section-title">✨ Key Features & Capabilities</h2>
-                <div class="three-column">
-                    <div class="box">
-                        <h3>📁 Data Collection</h3>
-                        <ul>
-                            <li>CSV file import</li>
-                            <li>PubMed API integration</li>
-                            <li>CrossRef API integration</li>
-                            <li>Europe PMC integration</li>
-                            <li>Batch processing</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>🔄 Data Processing</h3>
-                        <ul>
-                            <li>DOI-based deduplication</li>
-                            <li>PMID fallback matching</li>
-                            <li>Title normalization</li>
-                            <li>Schema validation</li>
-                            <li>Append/merge logic</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>✅ Quality Assessment</h3>
-                        <ul>
-                            <li>Custom scoring models</li>
-                            <li>Configurable weights</li>
-                            <li>Citation analysis</li>
-                            <li>Recency scoring</li>
-                            <li>Quality filtering</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>📊 Analysis Tools</h3>
-                        <ul>
-                            <li>Interactive dashboards</li>
-                            <li>Publication trends</li>
-                            <li>Top journals analysis</li>
-                            <li>Citation metrics</li>
-                            <li>SQL query interface</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>📄 Report Generation</h3>
-                        <ul>
-                            <li>PDF reports with charts</li>
-                            <li>RIS export</li>
-                            <li>BibTeX export</li>
-                            <li>CSV downloads</li>
-                            <li>Custom cover pages</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>🚀 Deployment</h3>
-                        <ul>
-                            <li>Docker containerization</li>
-                            <li>Streamlit Cloud</li>
-                            <li>GitHub Actions CI/CD</li>
-                            <li>Multi-arch support</li>
-                            <li>Auto-deployment</li>
-                        </ul>
-                    </div>
+                <h2 class="section-title">📁 Data Collection</h2>
+                <div class="box">
+                    <ul>
+                        <li>CSV import</li>
+                        <li>PubMed API</li>
+                        <li>CrossRef API</li>
+                        <li>Europe PMC</li>
+                        <li>Batch processing</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- API Integration -->
             <div class="section">
+                <h2 class="section-title">🔄 Processing</h2>
+                <div class="box">
+                    <ul>
+                        <li>DOI deduplication</li>
+                        <li>PMID matching</li>
+                        <li>Title normalization</li>
+                        <li>Schema validation</li>
+                        <li>Merge logic</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">✅ Quality</h2>
+                <div class="box">
+                    <ul>
+                        <li>Custom scoring</li>
+                        <li>Configurable weights</li>
+                        <li>Citation analysis</li>
+                        <li>Recency scoring</li>
+                        <li>Quality filtering</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📊 Analysis</h2>
+                <div class="box">
+                    <ul>
+                        <li>Dashboards</li>
+                        <li>Trends analysis</li>
+                        <li>Top journals</li>
+                        <li>Citation metrics</li>
+                        <li>SQL queries</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Row 3: API Integration (full width) -->
+            <div class="section full-width">
                 <h2 class="section-title">🔌 API Integration</h2>
                 <div class="api-grid">
                     <div class="api-box">
                         <h4>PubMed / NCBI</h4>
-                        <p>Biomedical literature with full metadata, abstracts, and author details</p>
+                        <p>Biomedical literature with full metadata, abstracts, author details</p>
                     </div>
                     <div class="api-box">
                         <h4>CrossRef</h4>
@@ -625,7 +615,7 @@
                     </div>
                 </div>
 
-                <table>
+                <table style="margin-top: 15px;">
                     <thead>
                         <tr>
                             <th>Feature</th>
@@ -663,10 +653,9 @@
                 </table>
             </div>
 
-            <!-- Results -->
-            <div class="section">
+            <!-- Row 4: Results (span 2) + Challenges (span 2) -->
+            <div class="section span-2">
                 <h2 class="section-title">📈 Results & Achievements</h2>
-
                 <div class="stats-grid">
                     <div class="stat-box">
                         <div class="stat-number">454</div>
@@ -681,132 +670,99 @@
                         <div class="stat-label">Duplicates Removed</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-number">97/100</div>
-                        <div class="stat-label">Quality Threshold</div>
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">API Success Rate</div>
                     </div>
                 </div>
-
-                <div class="two-column" style="margin-top: 30px;">
-                    <div class="box">
-                        <h3>Deduplication Results</h3>
-                        <ul>
-                            <li><strong>Original:</strong> 472 records</li>
-                            <li><strong>After deduplication:</strong> 454 records</li>
-                            <li><strong>Duplicates removed:</strong> 18 (3.8%)</li>
-                            <li><strong>Strategy:</strong> DOI → PMID → Title hierarchy</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>System Performance</h3>
-                        <ul>
-                            <li><strong>API Success Rate:</strong> 100%</li>
-                            <li><strong>Database Integrity:</strong> Validated</li>
-                            <li><strong>Cloud Deployment:</strong> Active</li>
-                            <li><strong>Error Handling:</strong> Graceful degradation</li>
-                        </ul>
-                    </div>
+                <div class="box" style="margin-top: 15px;">
+                    <h3>Deduplication Strategy</h3>
+                    <p><strong>472 → 454 records</strong> using DOI → PMID → Title hierarchy. Removed 18 duplicates (3.8%), ensuring clean dataset with validated database integrity.</p>
                 </div>
             </div>
 
-            <!-- Challenges & Solutions -->
-            <div class="section">
+            <div class="section span-2">
                 <h2 class="section-title">🔧 Challenges & Solutions</h2>
-                <table>
+                <table style="font-size: 0.9em;">
                     <thead>
                         <tr>
                             <th>Challenge</th>
                             <th>Solution</th>
-                            <th>Outcome</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Schema misalignment (citation_count vs citations_count)</td>
-                            <td>Created diagnostic tool and aligned all references</td>
-                            <td>Fixed schema, added source_database column</td>
+                            <td>Schema misalignment</td>
+                            <td>Diagnostic tool + aligned references</td>
                         </tr>
                         <tr>
-                            <td>18 duplicate records in database</td>
-                            <td>Implemented hierarchical deduplication (DOI→PMID→Title)</td>
-                            <td>Clean dataset with 454 unique records</td>
+                            <td>18 duplicate records</td>
+                            <td>Hierarchical deduplication (DOI→PMID→Title)</td>
                         </tr>
                         <tr>
-                            <td>Streamlit Cloud deployment errors</td>
-                            <td>Added safe_read_table() with fallback logic</td>
-                            <td>Graceful handling, successful deployment</td>
+                            <td>Cloud deployment errors</td>
+                            <td>safe_read_table() with fallback logic</td>
                         </tr>
                         <tr>
-                            <td>Empty citation data display issues</td>
-                            <td>Conditional rendering with user guidance</td>
-                            <td>Better UX with helpful messages</td>
+                            <td>Empty citation display</td>
+                            <td>Conditional rendering + user guidance</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Conclusion -->
-            <div class="conclusion">
+            <!-- Row 5: Conclusion (full width) -->
+            <div class="conclusion full-width">
                 <h3>🎯 Conclusion & Impact</h3>
                 <p><strong>Successfully developed a production-ready bibliometric analysis system</strong> that integrates multiple academic APIs, implements robust deduplication strategies, and provides comprehensive analysis tools.</p>
-                <p style="margin-top: 15px;"><strong>Key Contributions:</strong> Multi-API integration • Hierarchical deduplication • Automated quality scoring • Cloud deployment • Docker containerization • Comprehensive documentation</p>
+                <p style="margin-top: 10px;"><strong>Key Contributions:</strong> Multi-API integration • Hierarchical deduplication • Automated quality scoring • Cloud deployment • Docker containerization • Comprehensive documentation</p>
             </div>
 
-            <!-- Future Work -->
+            <!-- Row 6: Future Work (span 3) + References (span 1) -->
             <div class="section">
-                <h2 class="section-title">🚀 Future Enhancements</h2>
-                <div class="three-column">
-                    <div class="box">
-                        <h3>Short-term</h3>
-                        <ul>
-                            <li>Co-authorship networks</li>
-                            <li>Citation graphs</li>
-                            <li>Advanced filtering</li>
-                            <li>Email notifications</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>Medium-term</h3>
-                        <ul>
-                            <li>PostgreSQL migration</li>
-                            <li>Redis caching</li>
-                            <li>Parallel API calls</li>
-                            <li>User authentication</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>Long-term</h3>
-                        <ul>
-                            <li>Machine learning models</li>
-                            <li>Topic modeling</li>
-                            <li>Sentiment analysis</li>
-                            <li>Scopus/WoS integration</li>
-                        </ul>
-                    </div>
+                <h2 class="section-title">🚀 Short-term</h2>
+                <div class="box">
+                    <ul>
+                        <li>Co-authorship networks</li>
+                        <li>Citation graphs</li>
+                        <li>Advanced filtering</li>
+                        <li>Email alerts</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- References & Contact -->
             <div class="section">
-                <h2 class="section-title">📚 References & Resources</h2>
-                <div class="two-column">
-                    <div class="box">
-                        <h3>Key References</h3>
-                        <ul style="font-size: 0.95em;">
-                            <li>PubMed E-utilities: NCBI Entrez Programming Utilities</li>
-                            <li>CrossRef REST API Documentation</li>
-                            <li>Europe PMC RESTful Web Service</li>
-                            <li>Streamlit Documentation for Production Apps</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>Project Resources</h3>
-                        <ul style="font-size: 0.95em;">
-                            <li><strong>Repository:</strong> github.com/eskgyimah/Capstone</li>
-                            <li><strong>Documentation:</strong> API_DOCUMENTATION.md</li>
-                            <li><strong>Deployment:</strong> Streamlit Cloud + Docker</li>
-                            <li><strong>Database:</strong> 454 deduplicated records</li>
-                        </ul>
-                    </div>
+                <h2 class="section-title">🔮 Medium-term</h2>
+                <div class="box">
+                    <ul>
+                        <li>PostgreSQL migration</li>
+                        <li>Redis caching</li>
+                        <li>Parallel API calls</li>
+                        <li>Authentication</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🌟 Long-term</h2>
+                <div class="box">
+                    <ul>
+                        <li>ML models</li>
+                        <li>Topic modeling</li>
+                        <li>Sentiment analysis</li>
+                        <li>Scopus/WoS integration</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📚 Resources</h2>
+                <div class="box">
+                    <ul style="font-size: 0.85em;">
+                        <li><strong>Repo:</strong> github.com/eskgyimah/Capstone</li>
+                        <li><strong>Docs:</strong> API_DOCUMENTATION.md</li>
+                        <li><strong>Deploy:</strong> Streamlit Cloud + Docker</li>
+                        <li><strong>DB:</strong> 454 records</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -830,14 +786,15 @@
 
         function downloadPDF() {
             // Show print dialog with instructions
-            alert('To save as PDF:\n\n1. In the print dialog, select "Save as PDF" or "Microsoft Print to PDF" as your printer\n2. Click "Save" or "Print"\n3. Choose a location and filename\n4. Your poster will be saved as a high-quality PDF ready for printing\n\nRecommended settings:\n• Paper: A0 (841 × 1189 mm)\n• Orientation: Portrait\n• Margins: None\n• Scale: 100%\n• Background graphics: Enabled');
+            alert('To save as PDF:\n\n1. In the print dialog, select "Save as PDF" or "Microsoft Print to PDF" as your printer\n2. Click "Save" or "Print"\n3. Choose a location and filename\n4. Your poster will be saved as a high-quality PDF ready for printing\n\nRecommended settings:\n• Paper: A0 LANDSCAPE (1189 × 841 mm)\n• Orientation: LANDSCAPE (horizontal)\n• Margins: None\n• Scale: 100%\n• Background graphics: Enabled');
             window.print();
         }
 
         // Add visual feedback for print-ready status
         window.addEventListener('load', () => {
             console.log('Poster loaded successfully');
-            console.log('Dimensions: A0 Portrait (841mm × 1189mm)');
+            console.log('Dimensions: A0 LANDSCAPE (1189mm × 841mm)');
+            console.log('Banner format - content spread horizontally');
             console.log('Ready for professional printing');
 
             // Add watermark for screen view only
@@ -857,7 +814,7 @@
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
                     z-index: 999;
                 `;
-                watermark.innerHTML = '📏 A0 Format (841 × 1189 mm) • Ready for Professional Printing';
+                watermark.innerHTML = '📏 A0 LANDSCAPE (1189 × 841 mm) • Banner Format • Ready for Professional Printing';
                 document.body.appendChild(watermark);
             }
         });
@@ -869,9 +826,9 @@
             const height = poster.offsetHeight;
 
             console.log(`Current poster dimensions: ${width}px × ${height}px`);
-            console.log(`Target print dimensions: 841mm × 1189mm (A0)`);
-            console.log(`At 300 DPI: 9933px × 14043px`);
-            console.log(`At 150 DPI: 4967px × 7022px`);
+            console.log(`Target print dimensions: 1189mm × 841mm (A0 LANDSCAPE)`);
+            console.log(`At 300 DPI: 14043px × 9933px`);
+            console.log(`At 150 DPI: 7022px × 4967px`);
         }
 
         // Log dimensions on load
