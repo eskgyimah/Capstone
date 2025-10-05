@@ -64,6 +64,9 @@ C:\Users\eskgy\Desktop\DMA_CAPSTONE\
 ├── Dockerfile              # Docker configuration
 ├── .gitignore              # Git ignore rules
 ├── README.md               # This file
+├── defense_presentation.html # HTML defense presentation (10 slides)
+├── research_poster.html    # Research poster (A0 format)
+├── API_DOCUMENTATION.md    # Complete API integration guide
 └── reports/                # Generated PDF reports
 ```
 
@@ -73,6 +76,21 @@ C:\Users\eskgy\Desktop\DMA_CAPSTONE\
 - **FIXES_SUMMARY.md** - Database schema fixes
 - **OPTION_A_APPLIED.md** - Deduplication approach
 - **UI_IMPROVEMENTS.md** - UI enhancements
+- **API_DOCUMENTATION.md** - Complete API integration guide
+
+## Defense Materials
+
+### HTML Defense Presentation
+- **File:** `defense_presentation.html`
+- **Format:** 10 interactive slides
+- **Features:** Keyboard navigation (arrow keys), modern design, UCC branding
+- **Open with:** Any web browser (Chrome, Firefox, Edge)
+
+### Research Poster
+- **File:** `research_poster.html`
+- **Format:** A0 portrait (printable)
+- **Features:** Comprehensive sections, statistics, tables, professional layout
+- **Print:** Open in browser and press Ctrl+P for PDF export
 
 ## Git Workflow
 
