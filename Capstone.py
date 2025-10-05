@@ -1,7 +1,7 @@
 
 # Capstone.py — UCC Bibliometric System (no placeholders)
 # Full app: Data Collection • Quality Assessment • Analysis • Report • Orchestrator
-import os, re, json, sqlite3, io
+import os, re, json, sqlite3, io, time
 from functools import lru_cache
 
 import pandas as pd
@@ -14,6 +14,19 @@ except Exception:
     px = None
 
 from matplotlib.backends.backend_pdf import PdfPages
+
+# API imports
+try:
+    from Bio import Entrez
+    BIOPYTHON_AVAILABLE = True
+except ImportError:
+    BIOPYTHON_AVAILABLE = False
+
+try:
+    import requests
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
 
 # -------------------------
 # Config
@@ -256,6 +269,239 @@ def to_bibtex(df: pd.DataFrame) -> str:
     return "\n\n".join(entries)
 
 # -------------------------
+# API Integration Functions
+# -------------------------
+def fetch_pubmed(query, max_results=100, email="edward.gyimah002@stu.ucc.edu.gh"):
+    """
+    Fetch papers from PubMed API using Entrez
+
+    Args:
+        query: Search query (e.g., "COVID-19 AND vaccine")
+        max_results: Maximum records to retrieve
+        email: Required by NCBI
+
+    Returns:
+        DataFrame with columns: pmid, title, journal, year, authors, doi, abstract, source_database, citation_count
+    """
+    if not BIOPYTHON_AVAILABLE:
+        raise ImportError("Biopython not installed. Run: pip install biopython")
+
+    Entrez.email = email
+
+    try:
+        # Step 1: Search for PMIDs
+        handle = Entrez.esearch(db="pubmed", term=query, retmax=max_results)
+        record = Entrez.read(handle)
+        handle.close()
+        pmids = record["IdList"]
+
+        if not pmids:
+            return pd.DataFrame()
+
+        # Step 2: Fetch details in batches
+        batch_size = 100
+        records = []
+
+        for i in range(0, len(pmids), batch_size):
+            batch_ids = pmids[i:i+batch_size]
+
+            handle = Entrez.efetch(
+                db="pubmed",
+                id=batch_ids,
+                rettype="medline",
+                retmode="xml"
+            )
+            batch_records = Entrez.read(handle)
+            handle.close()
+            records.extend(batch_records['PubmedArticle'])
+
+            # Rate limiting
+            time.sleep(0.34)  # ~3 requests/second
+
+        # Step 3: Parse records into DataFrame
+        data = []
+        for rec in records:
+            article = rec['MedlineCitation']['Article']
+
+            # Extract authors
+            authors = []
+            if 'AuthorList' in article:
+                for author in article['AuthorList']:
+                    if 'LastName' in author and 'ForeName' in author:
+                        authors.append(f"{author['LastName']}, {author['ForeName']}")
+
+            # Extract DOI
+            doi = ""
+            if 'ELocationID' in article:
+                for eid in article['ELocationID']:
+                    if eid.attributes.get('EIdType') == 'doi':
+                        doi = str(eid)
+
+            # Extract abstract
+            abstract = ""
+            if 'Abstract' in article:
+                abstract_texts = article['Abstract'].get('AbstractText', [])
+                abstract = " ".join([str(t) for t in abstract_texts])
+
+            # Extract year
+            year = ""
+            if 'Journal' in article:
+                pub_date = article['Journal'].get('JournalIssue', {}).get('PubDate', {})
+                year = pub_date.get('Year', '')
+
+            data.append({
+                'pmid': str(rec['MedlineCitation']['PMID']),
+                'title': article.get('ArticleTitle', ''),
+                'journal': article['Journal']['Title'] if 'Journal' in article else '',
+                'year': year,
+                'authors': "; ".join(authors),
+                'doi': doi,
+                'abstract': abstract,
+                'source_database': 'PubMed',
+                'citation_count': 0,
+                'publication_date': year if year else None
+            })
+
+        return pd.DataFrame(data)
+
+    except Exception as e:
+        raise Exception(f"PubMed API error: {str(e)}")
+
+
+def fetch_crossref(query, max_results=100):
+    """
+    Fetch papers from CrossRef API
+
+    Args:
+        query: Search query (title, author, keyword)
+        max_results: Maximum records to retrieve
+
+    Returns:
+        DataFrame with columns: doi, title, journal, year, authors, citation_count, source_database
+    """
+    if not REQUESTS_AVAILABLE:
+        raise ImportError("requests not installed. Run: pip install requests")
+
+    base_url = "https://api.crossref.org/works"
+    headers = {
+        "User-Agent": "COVID19-Bibliometric-Analysis/1.0 (mailto:edward.gyimah002@stu.ucc.edu.gh)"
+    }
+
+    params = {
+        "query": query,
+        "rows": min(max_results, 1000),
+        "select": "DOI,title,container-title,published,author,is-referenced-by-count"
+    }
+
+    try:
+        response = requests.get(base_url, params=params, headers=headers, timeout=30)
+        response.raise_for_status()
+
+        data = response.json()
+        items = data.get("message", {}).get("items", [])
+
+        if not items:
+            return pd.DataFrame()
+
+        # Parse records
+        records = []
+        for item in items:
+            # Extract authors
+            authors = []
+            if "author" in item:
+                for author in item["author"]:
+                    given = author.get("given", "")
+                    family = author.get("family", "")
+                    if family:
+                        authors.append(f"{family}, {given}".strip(", "))
+
+            # Extract year
+            year = ""
+            if "published" in item:
+                date_parts = item["published"].get("date-parts", [[]])
+                if date_parts and date_parts[0]:
+                    year = str(date_parts[0][0])
+
+            # Extract journal
+            journal = ""
+            if "container-title" in item:
+                journal = item["container-title"][0] if item["container-title"] else ""
+
+            records.append({
+                'doi': item.get("DOI", ""),
+                'title': item.get("title", [""])[0] if item.get("title") else "",
+                'journal': journal,
+                'year': year,
+                'authors': "; ".join(authors),
+                'citation_count': item.get("is-referenced-by-count", 0),
+                'source_database': 'CrossRef',
+                'pmid': '',
+                'abstract': '',
+                'publication_date': year if year else None
+            })
+
+        return pd.DataFrame(records)
+
+    except Exception as e:
+        raise Exception(f"CrossRef API error: {str(e)}")
+
+
+def fetch_europepmc(query, max_results=100):
+    """
+    Fetch papers from Europe PMC API
+
+    Args:
+        query: Search query
+        max_results: Maximum records to retrieve
+
+    Returns:
+        DataFrame with columns: pmid, pmcid, doi, title, journal, year, authors, abstract, citation_count
+    """
+    if not REQUESTS_AVAILABLE:
+        raise ImportError("requests not installed. Run: pip install requests")
+
+    base_url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
+
+    params = {
+        "query": query,
+        "format": "json",
+        "pageSize": min(max_results, 1000),
+        "cursorMark": "*"
+    }
+
+    try:
+        response = requests.get(base_url, params=params, timeout=30)
+        response.raise_for_status()
+
+        data = response.json()
+        results = data.get("resultList", {}).get("result", [])
+
+        if not results:
+            return pd.DataFrame()
+
+        # Parse records
+        records = []
+        for item in results:
+            records.append({
+                'pmid': item.get("pmid", ""),
+                'pmcid': item.get("pmcid", ""),
+                'doi': item.get("doi", ""),
+                'title': item.get("title", ""),
+                'journal': item.get("journalTitle", ""),
+                'year': item.get("pubYear", ""),
+                'authors': item.get("authorString", ""),
+                'abstract': item.get("abstractText", ""),
+                'citation_count': item.get("citedByCount", 0),
+                'source_database': 'Europe PMC',
+                'publication_date': item.get("pubYear", None)
+            })
+
+        return pd.DataFrame(records)
+
+    except Exception as e:
+        raise Exception(f"Europe PMC API error: {str(e)}")
+
+# -------------------------
 # Sidebar: Institution Branding
 # -------------------------
 cfg = UCCProductionConfig()
@@ -397,35 +643,35 @@ def render_data_collection():
                 st.error("Please enter a search query")
             elif not pubmed_email.strip():
                 st.error("Email is required by NCBI API")
+            elif not BIOPYTHON_AVAILABLE:
+                st.error("⚠️ Biopython not installed. Run: `pip install biopython`")
             else:
-                with st.spinner("Fetching data from PubMed..."):
-                    st.info(f"""
-                    **API Endpoint:** `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/`
+                with st.spinner(f"Fetching {pubmed_max} records from PubMed..."):
+                    try:
+                        df_new = fetch_pubmed(pubmed_query, pubmed_max, pubmed_email)
 
-                    **Search Query:** `{pubmed_query}`
+                        if df_new.empty:
+                            st.warning("No results found for this query")
+                        else:
+                            st.success(f"✅ Fetched {len(df_new)} records from PubMed")
 
-                    **Max Results:** {pubmed_max}
+                            # Preview results
+                            st.subheader("Preview")
+                            preview_cols = [c for c in ["title", "journal", "year", "authors", "doi", "pmid"] if c in df_new.columns]
+                            st.dataframe(df_new[preview_cols].head(10), use_container_width=True)
 
-                    **Implementation Steps:**
-                    1. Use Entrez.esearch() to get PMIDs
-                    2. Use Entrez.efetch() to get full records
-                    3. Parse XML/JSON response
-                    4. Extract: title, authors, journal, date, PMID, DOI, abstract
-                    5. Store in papers_deduped table
+                            # Save to database
+                            if st.button("💾 Save to Database", key="save_pubmed"):
+                                # Determine merge key
+                                merge_key = "doi" if "doi" in df_new.columns and df_new["doi"].notna().any() else "pmid"
 
-                    **Required Package:** `pip install biopython`
+                                rows_added = append_merge_by_key(conn, df_new, "papers_deduped", merge_key)
+                                st.success(f"✅ Added/updated {rows_added} records in papers_deduped table")
+                                st.info(f"💡 Used '{merge_key}' as merge key for deduplication")
 
-                    **Sample Code:**
-                    ```python
-                    from Bio import Entrez
-                    Entrez.email = "{pubmed_email}"
-                    handle = Entrez.esearch(db="pubmed", term="{pubmed_query}", retmax={pubmed_max})
-                    record = Entrez.read(handle)
-                    pmids = record["IdList"]
-                    # Fetch details...
-                    ```
-                    """)
-                    st.warning("⚠️ API integration requires additional setup. This is a placeholder showing the implementation approach.")
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
+                        st.caption("Check your query syntax or internet connection")
 
     with api_tab2:
         st.markdown("**CrossRef API** - Search scholarly publications by DOI")
@@ -435,37 +681,32 @@ def render_data_collection():
         if st.button("🔍 Fetch from CrossRef", key="fetch_crossref"):
             if not crossref_query.strip():
                 st.error("Please enter a search query")
+            elif not REQUESTS_AVAILABLE:
+                st.error("⚠️ requests library not installed. Run: `pip install requests`")
             else:
-                with st.spinner("Fetching data from CrossRef..."):
-                    st.info(f"""
-                    **API Endpoint:** `https://api.crossref.org/works`
+                with st.spinner(f"Fetching {crossref_max} records from CrossRef..."):
+                    try:
+                        df_new = fetch_crossref(crossref_query, crossref_max)
 
-                    **Search Query:** `{crossref_query}`
+                        if df_new.empty:
+                            st.warning("No results found for this query")
+                        else:
+                            st.success(f"✅ Fetched {len(df_new)} records from CrossRef")
 
-                    **Max Results:** {crossref_max}
+                            # Preview results
+                            st.subheader("Preview")
+                            preview_cols = [c for c in ["title", "journal", "year", "authors", "doi", "citation_count"] if c in df_new.columns]
+                            st.dataframe(df_new[preview_cols].head(10), use_container_width=True)
 
-                    **Implementation Steps:**
-                    1. Send GET request with query parameters
-                    2. Parse JSON response
-                    3. Extract: title, authors, journal, date, DOI, citation count
-                    4. Store in papers_deduped table
+                            # Save to database
+                            if st.button("💾 Save to Database", key="save_crossref"):
+                                rows_added = append_merge_by_key(conn, df_new, "papers_deduped", "doi")
+                                st.success(f"✅ Added/updated {rows_added} records in papers_deduped table")
+                                st.info("💡 Used 'doi' as merge key for deduplication")
 
-                    **Required Package:** `pip install requests`
-
-                    **Sample Code:**
-                    ```python
-                    import requests
-                    url = "https://api.crossref.org/works"
-                    params = {{
-                        "query": "{crossref_query}",
-                        "rows": {crossref_max}
-                    }}
-                    response = requests.get(url, params=params)
-                    data = response.json()
-                    # Process results...
-                    ```
-                    """)
-                    st.warning("⚠️ API integration requires additional setup. This is a placeholder showing the implementation approach.")
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
+                        st.caption("Check your query syntax or internet connection")
 
     with api_tab3:
         st.markdown("**Europe PMC API** - European biomedical literature database")
@@ -475,64 +716,61 @@ def render_data_collection():
         if st.button("🔍 Fetch from Europe PMC", key="fetch_europepmc"):
             if not europepmc_query.strip():
                 st.error("Please enter a search query")
+            elif not REQUESTS_AVAILABLE:
+                st.error("⚠️ requests library not installed. Run: `pip install requests`")
             else:
-                with st.spinner("Fetching data from Europe PMC..."):
-                    st.info(f"""
-                    **API Endpoint:** `https://www.ebi.ac.uk/europepmc/webservices/rest/search`
+                with st.spinner(f"Fetching {europepmc_max} records from Europe PMC..."):
+                    try:
+                        df_new = fetch_europepmc(europepmc_query, europepmc_max)
 
-                    **Search Query:** `{europepmc_query}`
+                        if df_new.empty:
+                            st.warning("No results found for this query")
+                        else:
+                            st.success(f"✅ Fetched {len(df_new)} records from Europe PMC")
 
-                    **Max Results:** {europepmc_max}
+                            # Preview results
+                            st.subheader("Preview")
+                            preview_cols = [c for c in ["title", "journal", "year", "authors", "doi", "pmid", "citation_count"] if c in df_new.columns]
+                            st.dataframe(df_new[preview_cols].head(10), use_container_width=True)
 
-                    **Implementation Steps:**
-                    1. Send GET request with query and format=json
-                    2. Parse JSON response
-                    3. Extract: title, authors, journal, date, PMID, DOI, citation count
-                    4. Store in papers_deduped table
+                            # Save to database
+                            if st.button("💾 Save to Database", key="save_europepmc"):
+                                # Determine merge key (prefer DOI, fallback to PMID)
+                                merge_key = "doi" if "doi" in df_new.columns and df_new["doi"].notna().any() else "pmid"
 
-                    **Required Package:** `pip install requests`
+                                rows_added = append_merge_by_key(conn, df_new, "papers_deduped", merge_key)
+                                st.success(f"✅ Added/updated {rows_added} records in papers_deduped table")
+                                st.info(f"💡 Used '{merge_key}' as merge key for deduplication")
 
-                    **Sample Code:**
-                    ```python
-                    import requests
-                    url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
-                    params = {{
-                        "query": "{europepmc_query}",
-                        "format": "json",
-                        "pageSize": {europepmc_max}
-                    }}
-                    response = requests.get(url, params=params)
-                    data = response.json()
-                    # Process results...
-                    ```
-                    """)
-                    st.warning("⚠️ API integration requires additional setup. This is a placeholder showing the implementation approach.")
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
+                        st.caption("Check your query syntax or internet connection")
 
     st.markdown("""
     ---
-    **📚 API Integration Guide:**
+    **📚 API Integration Status:**
 
-    1. **Install Required Packages:**
-       ```bash
-       pip install biopython requests
-       ```
+    **✅ Fully Functional APIs:**
+    - **PubMed:** Fetches biomedical literature with full metadata
+    - **CrossRef:** Retrieves scholarly publications with citation counts
+    - **Europe PMC:** European biomedical database with abstracts
 
-    2. **Get API Keys (if required):**
-       - PubMed: No key required, email mandatory
-       - CrossRef: No key required, add User-Agent for courtesy
-       - Europe PMC: No key required
+    **📦 Required Packages:**
+    - `biopython` - ✅ Installed (for PubMed)
+    - `requests` - ✅ Installed (for CrossRef & Europe PMC)
 
-    3. **Implementation Status:**
-       - ✅ UI ready
-       - ⚠️ API calls need to be implemented (see code samples above)
-       - 📊 Response parsing logic to be added
-       - 💾 Database integration ready
+    **🔑 Authentication:**
+    - PubMed: Email mandatory (auto-filled with your UCC email)
+    - CrossRef: No authentication required
+    - Europe PMC: No authentication required
 
-    4. **Next Steps:**
-       - Implement actual API calls using sample code
-       - Add error handling and rate limiting
-       - Parse responses into DataFrame
-       - Use existing append/merge logic to store data
+    **💡 Usage Tips:**
+    - Start with small queries (10-50 results) to test
+    - Use specific search terms for better results
+    - Review preview before saving to database
+    - Deduplication is automatic using DOI/PMID keys
+
+    **📖 Full documentation:** See `API_DOCUMENTATION.md` for advanced usage
     """)
 
     st.divider()
