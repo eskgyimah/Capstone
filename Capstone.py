@@ -1,39 +1,26 @@
 
-# production_ucc_system_FINAL.py
-# Unified production Streamlit app with Orchestrator + DB Actions + Dry-Run + Append/Merge + PDF
-# Author: Co-Founder OS for Edd
-#
-# Pages:
-# - Data Collection (placeholder)
-# - Quality Assessment (placeholder)
-# - Analysis (placeholder)
-# - Report Generation (placeholder)
-# - Orchestrator Dashboard (full features)
-#
-import os, re, json, sqlite3
+# Capstone.py — UCC Bibliometric System (no placeholders)
+# Full app: Data Collection • Quality Assessment • Analysis • Report • Orchestrator
+import os, re, json, sqlite3, io
 from functools import lru_cache
 
 import pandas as pd
 import numpy as np
 import streamlit as st
-
+import matplotlib.pyplot as plt
 try:
     import plotly.express as px
 except Exception:
     px = None
 
-import matplotlib.pyplot as plt
-
 from matplotlib.backends.backend_pdf import PdfPages
 
 # -------------------------
-# Config (edit as needed)
+# Config
 # -------------------------
 class UCCProductionConfig:
     def __init__(self):
-        # Quality threshold hint for UI/Report
         self.quality_threshold = int(os.getenv("UCC_QUALITY_THRESHOLD", "97"))
-        # UCC cover metadata (fill via env if you like)
         self.student_name = os.getenv("UCC_STUDENT_NAME", "")
         self.student_id = os.getenv("UCC_STUDENT_ID", "")
         self.student_email = os.getenv("UCC_STUDENT_EMAIL", "")
@@ -43,17 +30,14 @@ class UCCProductionConfig:
         self.project_title = os.getenv("UCC_PROJECT_TITLE", "COVID-19 Bibliometric Analysis at UCC")
         self.supervisor = os.getenv("UCC_SUPERVISOR", "")
 
-# ----------------------------------
-# App + DB bootstrap
-# ----------------------------------
-APP_TITLE = "UCC Bibliometric System — Production"
-DEFAULT_DB = (
-    os.getenv("BIB_DB")
-    or os.path.join(os.path.dirname(__file__), "covid_bibliometric_ucc.db")
-)
+APP_TITLE = "Capstone — UCC Bibliometric System"
+DEFAULT_DB = os.getenv("BIB_DB") or os.path.join(os.path.dirname(__file__), "covid_bibliometric_ucc.db")
 
 st.set_page_config(page_title=APP_TITLE, layout="wide")
 
+# -------------------------
+# DB utils
+# -------------------------
 @lru_cache(maxsize=1)
 def get_conn(db_path: str):
     conn = sqlite3.connect(db_path)
@@ -64,88 +48,24 @@ def table_exists(conn, name) -> bool:
     q = pd.read_sql_query("SELECT name FROM sqlite_master WHERE type='table' AND name=?;", conn, params=[name])
     return not q.empty
 
-# ----------------------------------
-# Domain helpers
-# ----------------------------------
-def parse_year(x):
-    if pd.isna(x): return None
-    s = str(x)
-    if len(s) >= 4 and s[:4].isdigit():
-        return int(s[:4])
-    return None
+def ensure_papers_schema(conn):
+    conn.execute("""
+    CREATE TABLE IF NOT EXISTS papers (
+        id INTEGER PRIMARY KEY,
+        title TEXT,
+        journal TEXT,
+        publication_date TEXT,
+        citations_count INTEGER,
+        quality_score REAL,
+        source_database TEXT,
+        doi TEXT UNIQUE,
+        pmid TEXT UNIQUE,
+        publication_type TEXT,
+        authors TEXT
+    );
+    """)
+    conn.commit()
 
-def normalize_authors(val):
-    if val is None or (isinstance(val, float) and np.isnan(val)): return []
-    if isinstance(val, (list, tuple)): return [str(a).strip() for a in val if str(a).strip()]
-    s = str(val).strip()
-    if not s: return []
-    try:
-        parsed = json.loads(s)
-        if isinstance(parsed, list): return [str(a).strip() for a in parsed if str(a).strip()]
-    except Exception: pass
-    if ";" in s: return [p.strip() for p in s.split(";") if p.strip()]
-    if "," in s:
-        parts = [p.strip() for p in s.split(";")]
-        if len(parts) > 1:
-            out = []
-            for seg in parts: out.extend([x.strip() for x in seg.split(",") if x.strip()])
-            return out
-        else:
-            return [p.strip() for p in s.split(",") if p.strip()]
-    return [s]
-
-def build_key(row):
-    for k in ("doi","pmid"):
-        if k in row and pd.notna(row[k]) and str(row[k]).strip(): return str(row[k]).strip().lower()
-    t = str(row.get("title","")).strip().lower()
-    return " ".join(t.split())
-
-def to_ris(df: pd.DataFrame) -> str:
-    lines = []
-    for _, r in df.iterrows():
-        ty = "JOUR"
-        if "publication_type" in r and pd.notna(r["publication_type"]):
-            pt = str(r["publication_type"]).lower()
-            if "preprint" in pt: ty = "UNPB"
-            elif "conference" in pt: ty = "CPAPER"
-        lines.append(f"TY  - {ty}")
-        if pd.notna(r.get("title")):  lines.append(f"TI  - {r['title']}")
-        if pd.notna(r.get("journal")):lines.append(f"JO  - {r['journal']}")
-        y = parse_year(r.get("publication_date")) if pd.notna(r.get("publication_date")) else None
-        if y: lines.append(f"PY  - {y}")
-        if pd.notna(r.get("doi")):   lines.append(f"DO  - {r['doi']}")
-        if pd.notna(r.get("pmid")):  lines.append(f"ID  - {r['pmid']}")
-        au_col = next((c for c in ["authors","author_list","creators","creator"] if c in r.index), None)
-        if au_col:
-            for au in normalize_authors(r[au_col]):
-                lines.append(f"AU  - {au}")
-        lines.append("ER  - ")
-        lines.append("")
-    return "\n".join(lines)
-
-def to_bibtex(df: pd.DataFrame) -> str:
-    entries = []
-    for i, r in df.iterrows():
-        key = (str(r.get("doi")) or str(r.get("pmid")) or f"paper{i}").replace("/", "_")
-        etype = "article"
-        y = parse_year(r.get("publication_date")) if "publication_date" in r.index else None
-        fields = []
-        if pd.notna(r.get("title")):   fields.append(f"  title = {{{r['title']}}}")
-        if pd.notna(r.get("journal")): fields.append(f"  journal = {{{r['journal']}}}")
-        if y:                          fields.append(f"  year = {{{y}}}")
-        if pd.notna(r.get("doi")):     fields.append(f"  doi = {{{r['doi']}}}")
-        if pd.notna(r.get("pmid")):    fields.append(f"  pmid = {{{r['pmid']}}}")
-        au_col = next((c for c in ["authors","author_list","creators","creator"] if c in r.index), None)
-        if au_col:
-            au = normalize_authors(r[au_col])
-            if au: fields.append("  author = {" + " and ".join(au) + "}")
-        entry = "@{etype}{{{key},\n{fields}\n}}".format(etype=etype, key=key, fields=",\n".join(fields))
-        entries.append(entry)
-    return "\n\n".join(entries)
-
-# ----------------------------------
-# Schema + Writes + Preview + Merge
-# ----------------------------------
 def schema_for(conn, table):
     try:
         info = pd.read_sql_query(f"PRAGMA table_info([{table}]);", conn)
@@ -221,22 +141,394 @@ def append_merge_by_key(conn, df_, table, key):
     conn.commit()
     return len(df_)
 
-# ----------------------------------
-# Orchestrator Dashboard
-# ----------------------------------
+# -------------------------
+# Domain helpers
+# -------------------------
+def parse_year(x):
+    if pd.isna(x): return None
+    s = str(x)
+    if len(s) >= 4 and s[:4].isdigit():
+        return int(s[:4])
+    return None
+
+def normalize_authors(val):
+    if val is None or (isinstance(val, float) and np.isnan(val)): return []
+    if isinstance(val, (list, tuple)): return [str(a).strip() for a in val if str(a).strip()]
+    s = str(val).strip()
+    if not s: return []
+    try:
+        parsed = json.loads(s)
+        if isinstance(parsed, list): return [str(a).strip() for a in parsed if str(a).strip()]
+    except Exception: pass
+    if ";" in s: return [p.strip() for p in s.split(";") if p.strip()]
+    if "," in s:
+        parts = [p.strip() for p in s.split(";")]
+        if len(parts) > 1:
+            out = []
+            for seg in parts: out.extend([x.strip() for x in seg.split(",") if x.strip()])
+            return out
+        else:
+            return [p.strip() for p in s.split(",") if p.strip()]
+    return [s]
+
+def build_key(row):
+    for k in ("doi","pmid"):
+        if k in row and pd.notna(row[k]) and str(row[k]).strip(): return str(row[k]).strip().lower()
+    t = str(row.get("title","")).strip().lower()
+    return " ".join(t.split())
+
+def to_ris(df: pd.DataFrame) -> str:
+    lines = []
+    for _, r in df.iterrows():
+        ty = "JOUR"
+        if "publication_type" in r and pd.notna(r["publication_type"]):
+            pt = str(r["publication_type"]).lower()
+            if "preprint" in pt: ty = "UNPB"
+            elif "conference" in pt: ty = "CPAPER"
+        lines.append(f"TY  - {ty}")
+        if pd.notna(r.get("title")):  lines.append(f"TI  - {r['title']}")
+        if pd.notna(r.get("journal")):lines.append(f"JO  - {r['journal']}")
+        y = parse_year(r.get("publication_date")) if pd.notna(r.get("publication_date")) else None
+        if y: lines.append(f"PY  - {y}")
+        if pd.notna(r.get("doi")):   lines.append(f"DO  - {r['doi']}")
+        if pd.notna(r.get("pmid")):  lines.append(f"ID  - {r['pmid']}")
+        au_col = next((c for c in ["authors","author_list","creators","creator"] if c in r.index), None)
+        if au_col:
+            for au in normalize_authors(r[au_col]):
+                lines.append(f"AU  - {au}")
+        lines.append("ER  - ")
+        lines.append("")
+    return "\n".join(lines)
+
+def to_bibtex(df: pd.DataFrame) -> str:
+    entries = []
+    for i, r in df.iterrows():
+        key = (str(r.get("doi")) or str(r.get("pmid")) or f"paper{i}").replace("/", "_")
+        etype = "article"
+        y = parse_year(r.get("publication_date")) if "publication_date" in r.index else None
+        fields = []
+        if pd.notna(r.get("title")):   fields.append(f"  title = {{{r['title']}}}")
+        if pd.notna(r.get("journal")): fields.append(f"  journal = {{{r['journal']}}}")
+        if y:                          fields.append(f"  year = {{{y}}}")
+        if pd.notna(r.get("doi")):     fields.append(f"  doi = {{{r['doi']}}}")
+        if pd.notna(r.get("pmid")):    fields.append(f"  pmid = {{{r['pmid']}}}")
+        au_col = next((c for c in ["authors","author_list","creators","creator"] if c in r.index), None)
+        if au_col:
+            au = normalize_authors(r[au_col])
+            if au: fields.append("  author = {" + " and ".join(au) + "}")
+        entry = "@{etype}{{{key},\n{fields}\n}}".format(etype=etype, key=key, fields=", ".join(fields))
+        entries.append(entry)
+    return "\n\n".join(entries)
+
+# -------------------------
+# Sidebar: DB path
+# -------------------------
+st.sidebar.header("Data Source")
+db_path = st.sidebar.text_input("SQLite DB path", value=DEFAULT_DB)
+conn = get_conn(db_path)
+ensure_papers_schema(conn)
+
+# -------------------------
+# Page: Data Collection
+# -------------------------
+def render_data_collection():
+    st.header("Data Collection")
+    st.caption("Upload CSV → map columns → preview → append/merge into DB; also dedupe full corpus.")
+
+    uploaded = st.file_uploader("Upload bibliometric CSV", type=["csv"])
+    if uploaded:
+        try:
+            df_up = pd.read_csv(uploaded)
+        except Exception as e:
+            st.error(f"Failed to read CSV: {e}")
+            return
+        st.subheader("Preview")
+        st.dataframe(df_up.head(100))
+
+        # Simple mapping UI
+        st.subheader("Column Mapping")
+        cols = df_up.columns.tolist()
+        def pick(label, default):
+            options = ["-- none --"] + cols
+            idx = options.index(default) if default in options else 0
+            return st.selectbox(label, options, index=idx)
+
+        m_title  = pick("Title", "title")
+        m_journ  = pick("Journal", "journal")
+        m_date   = pick("Publication Date (YYYY...)", "publication_date")
+        m_cit    = pick("Citations", "citations_count")
+        m_src    = pick("Source Database", "source_database")
+        m_doi    = pick("DOI", "doi")
+        m_pmid   = pick("PMID", "pmid")
+        m_ptype  = pick("Publication Type", "publication_type")
+        m_auth   = pick("Authors (string or list)", "authors")
+
+        def map_df(dfin):
+            out = pd.DataFrame()
+            def get(c): return None if c=="-- none --" else dfin.get(c)
+            out["title"] = get(m_title)
+            out["journal"] = get(m_journ)
+            out["publication_date"] = get(m_date)
+            out["citations_count"] = pd.to_numeric(get(m_cit), errors="coerce") if get(m_cit) is not None else None
+            out["source_database"] = get(m_src)
+            out["doi"] = get(m_doi)
+            out["pmid"] = get(m_pmid)
+            out["publication_type"] = get(m_ptype)
+            out["authors"] = get(m_auth)
+            return out
+
+        mapped = map_df(df_up)
+        st.subheader("Mapped Preview")
+        st.dataframe(mapped.head(100))
+
+        st.subheader("Append/Merge")
+        target = st.text_input("Target table", value="papers")
+        use_doi = st.checkbox("Use DOI as merge key", value=True)
+        use_pmid = st.checkbox("Use PMID as merge key", value=True)
+        if st.button("Append/Merge into DB"):
+            if mapped.empty:
+                st.error("No data to write.")
+            else:
+                # create shell if absent
+                if not table_exists(conn, target):
+                    ok = write_table_preserve(conn, mapped.head(0), target, overwrite=True)
+                    if not ok: st.error("Failed to create target table."); return
+                # perform merges
+                total = 0
+                if use_doi and "doi" in mapped.columns:
+                    df_doi = mapped[mapped["doi"].notna() & (mapped["doi"].astype(str)!="")]
+                    if not df_doi.empty:
+                        total += append_merge_by_key(conn, df_doi, target, "doi")
+                if use_pmid and "pmid" in mapped.columns:
+                    df_pmid = mapped[mapped["pmid"].notna() & (mapped["pmid"].astype(str)!="")]
+                    if not df_pmid.empty:
+                        total += append_merge_by_key(conn, df_pmid, target, "pmid")
+                st.success(f"Append/Merge completed. Processed rows: {total:,}.")
+
+    st.divider()
+    st.subheader("Deduplicate FULL 'papers' → new table")
+    new_name = st.text_input("New table name", value="papers_dedup_dc")
+    if st.button("Run dedupe (by DOI→PMID→Title)"):
+        full = pd.read_sql_query("SELECT * FROM papers;", conn)
+        if full.empty:
+            st.error("No data in 'papers'.")
+        else:
+            keys = [build_key(r) for _, r in full.iterrows()]
+            out = full.assign(_k=keys).drop_duplicates("_k").drop(columns=["_k"])
+            overwrite = False
+            exists = table_exists(conn, new_name)
+            if exists:
+                st.warning(f"Table {new_name} exists. Tick to overwrite.")
+                overwrite = st.checkbox("Yes, overwrite", key="dc_over")
+            if overwrite or not exists:
+                ok = write_table_preserve(conn, out, new_name, overwrite=overwrite)
+                if ok: st.success(f"Created table '{new_name}' with {len(out):,} rows.")
+
+# -------------------------
+# Page: Quality Assessment
+# -------------------------
+def render_quality():
+    st.header("Quality Assessment")
+    st.caption("Compute/update quality_score; write back to DB.")
+    df = pd.read_sql_query("SELECT * FROM papers;", conn)
+    if df.empty:
+        st.info("No data in 'papers'."); return
+
+    # Basic heuristic scoring
+    st.subheader("Quality Model")
+    w_doi   = st.slider("Weight: has DOI", 0.0, 2.0, 0.5, 0.1)
+    w_cit   = st.slider("Weight: citations (normalized)", 0.0, 2.0, 1.0, 0.1)
+    w_rec   = st.slider("Weight: recency (year)", 0.0, 2.0, 0.7, 0.1)
+    w_jour  = st.slider("Weight: has Journal", 0.0, 2.0, 0.3, 0.1)
+
+    # compute year
+    if "publication_date" in df.columns:
+        df["year"] = df["publication_date"].apply(parse_year)
+    else:
+        df["year"] = None
+    y_now = pd.Timestamp.utcnow().year
+    cit = pd.to_numeric(df.get("citations_count", pd.Series([np.nan]*len(df))), errors="coerce")
+    cit_norm = (cit - np.nanmin(cit)) / (np.nanmax(cit) - np.nanmin(cit)) if np.nanmax(cit) != np.nanmin(cit) else 0
+    rec = (df["year"].fillna(y_now) - df["year"].fillna(y_now).min()) / max(1, (df["year"].fillna(y_now).max() - df["year"].fillna(y_now).min()))
+    score = 100*(w_doi*(df["doi"].notna() & (df["doi"].astype(str)!="")).astype(float)
+                 + w_cit*pd.to_numeric(cit_norm if not isinstance(cit_norm,int) else 0)
+                 + w_rec*pd.to_numeric(rec if not isinstance(rec,int) else 0)
+                 + w_jour*(df["journal"].notna() & (df["journal"].astype(str)!="")).astype(float))
+    # normalize to 0-100
+    if isinstance(score, pd.Series):
+        m, M = float(score.min()), float(score.max())
+        if M>m: score = (score - m) / (M - m) * 100.0
+        else: score = score.fillna(0.0)
+    df["quality_score_new"] = score.round(2)
+
+    st.subheader("Preview")
+    cols = [c for c in ["title","journal","publication_date","citations_count","doi","pmid","quality_score","quality_score_new"] if c in df.columns or c=="quality_score_new"]
+    st.dataframe(df[cols].head(200))
+
+    if st.button("Write quality_score to DB (UPDATE)"):
+        cur = conn.cursor()
+        # ensure column exists
+        try:
+            cur.execute("ALTER TABLE papers ADD COLUMN quality_score REAL;")
+        except Exception:
+            pass
+        # update using rowid mapping: safer with primary key id or doi/pmid
+        if "id" in df.columns and df["id"].notna().any():
+            for _id, val in zip(df["id"], df["quality_score_new"]):
+                cur.execute("UPDATE papers SET quality_score=? WHERE id=?", (float(val) if pd.notna(val) else None, int(_id)))
+        else:
+            # fallback: by doi
+            for doi, val in zip(df["doi"], df["quality_score_new"]):
+                if pd.notna(doi) and str(doi).strip():
+                    cur.execute("UPDATE papers SET quality_score=? WHERE doi=?", (float(val) if pd.notna(val) else None, str(doi)))
+        conn.commit()
+        st.success("quality_score updated.")
+
+# -------------------------
+# Page: Analysis
+# -------------------------
+def render_analysis():
+    st.header("Analysis")
+    df = pd.read_sql_query("SELECT * FROM papers;", conn)
+    if df.empty:
+        st.info("No data in 'papers'."); return
+
+    if "publication_date" in df.columns:
+        df["year"] = df["publication_date"].apply(parse_year)
+    else:
+        df["year"] = None
+    for col in ["citations_count","quality_score"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    c1,c2,c3 = st.columns(3)
+    with c1: st.metric("Total papers", f"{len(df):,}")
+    with c2:
+        if df["year"].notna().any(): st.metric("Year span", f"{int(df['year'].min())}–{int(df['year'].max())}")
+        else: st.metric("Year span", "—")
+    with c3:
+        if "citations_count" in df.columns and df["citations_count"].notna().any(): st.metric("Avg citations", f"{df['citations_count'].mean():.1f}")
+        else: st.metric("Avg citations", "—")
+
+    st.subheader("Publications per Year")
+    if df["year"].notna().any():
+        yearly = df.groupby("year").size().reset_index(name="count").sort_values("year")
+        try:
+            st.plotly_chart(px.line(yearly, x="year", y="count", markers=True), use_container_width=True)
+        except Exception:
+            st.line_chart(yearly.set_index("year"))
+
+    st.subheader("Top Journals")
+    if "journal" in df.columns:
+        jv = df["journal"].dropna().astype(str).value_counts().head(30).reset_index()
+        jv.columns = ["journal","count"]
+        try:
+            st.plotly_chart(px.bar(jv, x="journal", y="count"), use_container_width=True)
+        except Exception:
+            st.bar_chart(jv.set_index("journal"))
+
+    st.subheader("Source Distribution")
+    if "source_database" in df.columns:
+        sv = df["source_database"].dropna().astype(str).value_counts().reset_index()
+        sv.columns = ["source_database","count"]
+        try:
+            st.plotly_chart(px.bar(sv, x="source_database", y="count"), use_container_width=True)
+        except Exception:
+            st.bar_chart(sv.set_index("source_database"))
+
+    st.subheader("Top Cited")
+    if "citations_count" in df.columns:
+        topc = df.sort_values("citations_count", ascending=False).head(200)
+        cols = [c for c in ["title","journal","year","citations_count","doi","pmid"] if c in topc.columns]
+        st.dataframe(topc[cols].fillna("").head(200))
+
+# -------------------------
+# Page: Report Generation
+# -------------------------
+def render_report():
+    st.header("Report Generation")
+    st.caption("Generate a multi-page PDF (cover, yearly trend, source mix, top journals, top-cited).")
+    df = pd.read_sql_query("SELECT * FROM papers;", conn)
+    if df.empty:
+        st.info("No data in 'papers'."); return
+    if "publication_date" in df.columns:
+        df["year"] = df["publication_date"].apply(parse_year)
+    else: df["year"] = None
+    for col in ["citations_count","quality_score"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    cfg = UCCProductionConfig()
+    out_dir = os.path.join(os.path.dirname(__file__), "reports")
+    os.makedirs(out_dir, exist_ok=True)
+    import datetime as _dt
+    ts = _dt.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ")
+    pdf_path = os.path.join(out_dir, f"ucc_biblio_report_{ts}.pdf")
+
+    if st.button("Generate PDF now"):
+        with PdfPages(pdf_path) as pdf:
+            # Cover
+            fig = plt.figure(figsize=(8.27, 11.69)); ax = fig.add_subplot(111); ax.axis('off')
+            ax.set_title("UCC COVID-19 Bibliometric Report", pad=20, fontsize=16, weight='bold')
+            lines = [
+                f"Student: {cfg.student_name or '—'}  •  ID: {cfg.student_id or '—'}",
+                f"Email: {cfg.student_email or '—'}",
+                f"Institution: {cfg.institution or '—'}",
+                f"Department: {cfg.department or '—'}",
+                f"Programme: {cfg.program or '—'}",
+                f"Project Title: {cfg.project_title or '—'}",
+                f"Supervisor: {cfg.supervisor or '—'}",
+                "",
+                f"Records: {len(df):,}",
+            ]
+            if df["year"].notna().any(): lines.append(f"Year span: {int(df['year'].min())}–{int(df['year'].max())}")
+            if "citations_count" in df.columns and df["citations_count"].notna().any(): lines.append(f"Avg citations: {df['citations_count'].mean():.2f}")
+            if "quality_score" in df.columns and df["quality_score"].notna().any(): lines.append(f"Avg quality: {df['quality_score'].mean():.2f} (threshold {cfg.quality_threshold})")
+            y = 0.85
+            for ln in lines: ax.text(0.02, y, ln, transform=ax.transAxes, fontsize=11, va='top'); y -= 0.05
+            pdf.savefig(fig); plt.close(fig)
+
+            if df["year"].notna().any():
+                yearly = df.groupby("year").size().reset_index(name="count").sort_values("year")
+                fig = plt.figure(figsize=(8.27, 11.69)); ax = fig.add_subplot(111)
+                ax.plot(yearly["year"], yearly["count"], marker="o"); ax.set_title("Publications per Year"); ax.set_xlabel("Year"); ax.set_ylabel("Count")
+                pdf.savefig(fig); plt.close(fig)
+
+            if "source_database" in df.columns and not df["source_database"].isna().all():
+                srcv = df["source_database"].value_counts().head(20)
+                fig = plt.figure(figsize=(8.27, 11.69)); ax = fig.add_subplot(111)
+                ax.bar(srcv.index.astype(str), srcv.values); ax.set_title("Source Distribution (Top 20)")
+                ax.set_xticklabels(srcv.index.astype(str), rotation=45, ha="right"); ax.set_ylabel("Count"); fig.tight_layout()
+                pdf.savefig(fig); plt.close(fig)
+
+            if "journal" in df.columns and not df["journal"].isna().all():
+                jv = df["journal"].value_counts().head(20)
+                fig = plt.figure(figsize=(8.27, 11.69)); ax = fig.add_subplot(111)
+                ax.bar(jv.index.astype(str), jv.values); ax.set_title("Top Journals (Top 20)")
+                ax.set_xticklabels(jv.index.astype(str), rotation=45, ha="right"); ax.set_ylabel("Count"); fig.tight_layout()
+                pdf.savefig(fig); plt.close(fig)
+
+            if "citations_count" in df.columns and df["citations_count"].notna().any():
+                topc = df.sort_values("citations_count", ascending=False).head(20)
+                fig = plt.figure(figsize=(8.27, 11.69)); ax = fig.add_subplot(111); ax.axis('off'); ax.set_title("Top 20 by Citations", pad=20)
+                cols = [c for c in ["title","journal","year","citations_count"] if c in topc.columns]
+                table_data = [cols] + topc[cols].astype(str).values.tolist()
+                table = ax.table(cellText=table_data, loc='center'); table.auto_set_font_size(False); table.set_fontsize(8); table.scale(1,1.2)
+                pdf.savefig(fig); plt.close(fig)
+
+        try:
+            with open(pdf_path, "rb") as fh:
+                st.download_button("Download PDF", data=fh.read(), file_name=os.path.basename(pdf_path), mime="application/pdf")
+        except Exception as e:
+            st.info(f"PDF saved at: {pdf_path}")
+            st.error(f"Auto-download failed: {e}")
+
+# -------------------------
+# Page: Orchestrator Dashboard (full)
+# -------------------------
 def render_orchestrator_dashboard():
     st.header("🧭 Orchestrator Dashboard")
     st.caption("Filter • Explore • Export • Write-backs • Dry-Run • Append/Merge • PDF")
-
-    # Data source
-    db_path = st.sidebar.text_input("SQLite DB path", value=DEFAULT_DB)
-    if not os.path.exists(db_path):
-        st.error(f"Database not found at: {db_path}")
-        return
-    conn = get_conn(db_path)
-    if not table_exists(conn, "papers"):
-        st.error("Table 'papers' not found.")
-        return
 
     df = pd.read_sql_query("SELECT * FROM papers;", conn)
     if "publication_date" in df.columns:
@@ -309,8 +601,7 @@ def render_orchestrator_dashboard():
             if f["year"].notna().any():
                 yearly = f.groupby("year").size().reset_index(name="count").sort_values("year")
                 try:
-                    fig = px.line(yearly, x="year", y="count", markers=True, title="Publications per Year")
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(px.line(yearly, x="year", y="count", markers=True, title="Publications per Year"), use_container_width=True)
                 except Exception:
                     st.line_chart(yearly.set_index("year"))
             st.dataframe(f.head(200))
@@ -395,9 +686,10 @@ def render_orchestrator_dashboard():
             thr = st.slider("Quality threshold", min_value=0, max_value=100, value=cfg.quality_threshold, step=1)
             qname = st.text_input("New table name", value=f"papers_quality_ge_{thr}")
             if st.button("Write quality-filtered table", key="quality_run"):
-                if "quality_score" not in df.columns: st.error("No 'quality_score' column found.")
+                full = pd.read_sql_query("SELECT * FROM papers;", conn)
+                if "quality_score" not in full.columns: st.error("No 'quality_score' column found.")
                 else:
-                    qdf = df[df["quality_score"].fillna(0) >= thr].copy()
+                    qdf = full[full["quality_score"].fillna(0) >= thr].copy()
                     overwrite = False
                     if table_exists(conn, qname):
                         st.warning(f"Table {qname} exists. Tick to overwrite.")
@@ -423,8 +715,9 @@ def render_orchestrator_dashboard():
                 elif action == "Materialize FILTERED":
                     dprev = f.copy()
                 else:
-                    if "quality_score" not in df.columns: st.error("No 'quality_score' column found."); dprev = pd.DataFrame()
-                    else: dprev = df[df["quality_score"].fillna(0) >= thr_prev].copy()
+                    full = pd.read_sql_query("SELECT * FROM papers;", conn)
+                    if "quality_score" not in full.columns: st.error("No 'quality_score' column found."); dprev = pd.DataFrame()
+                    else: dprev = full[full["quality_score"].fillna(0) >= thr_prev].copy()
                 if dprev.empty: st.info("No rows in resulting DataFrame.")
                 else:
                     sc = schema_for(conn, "papers") or [(c,"TEXT") for c in dprev.columns]
@@ -525,7 +818,6 @@ def render_orchestrator_dashboard():
                     table_data = [cols] + topc[cols].astype(str).values.tolist()
                     table = ax.table(cellText=table_data, loc='center'); table.auto_set_font_size(False); table.set_fontsize(8); table.scale(1,1.2)
                     pdf.savefig(fig); plt.close(fig)
-            # Download button
             try:
                 with open(pdf_path, "rb") as fh:
                     st.download_button("Download PDF", data=fh.read(), file_name=os.path.basename(pdf_path), mime="application/pdf")
@@ -533,27 +825,20 @@ def render_orchestrator_dashboard():
                 st.info(f"PDF saved at: {pdf_path}")
                 st.error(f"Auto-download failed: {e}")
 
-# ----------------------------------
-# Placeholder pages (stubs)
-# ----------------------------------
-def render_placeholder(title, body="This section is a placeholder. Use the Orchestrator Dashboard for end-to-end operations."):
-    st.header(title)
-    st.info(body)
-
-# ----------------------------------
+# -------------------------
 # Main Router
-# ----------------------------------
+# -------------------------
 def main():
     st.title(APP_TITLE)
     page = st.sidebar.selectbox("Navigate", ["Data Collection","Quality Assessment","Analysis","Report Generation","Orchestrator Dashboard"])
     if page == "Data Collection":
-        render_placeholder("Data Collection")
+        render_data_collection()
     elif page == "Quality Assessment":
-        render_placeholder("Quality Assessment")
+        render_quality()
     elif page == "Analysis":
-        render_placeholder("Analysis")
+        render_analysis()
     elif page == "Report Generation":
-        render_placeholder("Report Generation")
+        render_report()
     elif page == "Orchestrator Dashboard":
         render_orchestrator_dashboard()
 
