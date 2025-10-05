@@ -53,8 +53,24 @@ def get_conn(db_path: str):
     return conn
 
 def table_exists(conn, name) -> bool:
-    q = pd.read_sql_query("SELECT name FROM sqlite_master WHERE type='table' AND name=?;", conn, params=[name])
-    return not q.empty
+    try:
+        q = pd.read_sql_query("SELECT name FROM sqlite_master WHERE type='table' AND name=?;", conn, params=[name])
+        return not q.empty
+    except Exception:
+        return False
+
+def safe_read_table(conn, table_name="papers_deduped"):
+    """Safely read table with error handling for cloud deployment"""
+    try:
+        if not table_exists(conn, table_name):
+            # Try papers table as fallback
+            if table_exists(conn, "papers"):
+                return pd.read_sql_query("SELECT * FROM papers;", conn)
+            return pd.DataFrame()
+        return pd.read_sql_query(f"SELECT * FROM {table_name};", conn)
+    except Exception as e:
+        st.error(f"⚠️ Database error: Unable to read data. {str(e)}")
+        return pd.DataFrame()
 
 def ensure_papers_schema(conn):
     conn.execute("""
@@ -365,10 +381,165 @@ def render_data_collection():
                 st.success(f"Append/Merge completed. Processed rows: {total:,}.")
 
     st.divider()
+    st.subheader("🔌 API Data Collection")
+    st.caption("Fetch bibliometric data directly from academic databases using their APIs")
+
+    api_tab1, api_tab2, api_tab3 = st.tabs(["PubMed", "CrossRef", "Europe PMC"])
+
+    with api_tab1:
+        st.markdown("**PubMed API** - Search biomedical literature")
+        pubmed_query = st.text_input("Search query (e.g., 'COVID-19')", key="pubmed_q")
+        pubmed_max = st.number_input("Max results", min_value=1, max_value=10000, value=100, key="pubmed_max")
+        pubmed_email = st.text_input("Email (required by NCBI)", value=cfg.student_email, key="pubmed_email")
+
+        if st.button("🔍 Fetch from PubMed", key="fetch_pubmed"):
+            if not pubmed_query.strip():
+                st.error("Please enter a search query")
+            elif not pubmed_email.strip():
+                st.error("Email is required by NCBI API")
+            else:
+                with st.spinner("Fetching data from PubMed..."):
+                    st.info(f"""
+                    **API Endpoint:** `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/`
+
+                    **Search Query:** `{pubmed_query}`
+
+                    **Max Results:** {pubmed_max}
+
+                    **Implementation Steps:**
+                    1. Use Entrez.esearch() to get PMIDs
+                    2. Use Entrez.efetch() to get full records
+                    3. Parse XML/JSON response
+                    4. Extract: title, authors, journal, date, PMID, DOI, abstract
+                    5. Store in papers_deduped table
+
+                    **Required Package:** `pip install biopython`
+
+                    **Sample Code:**
+                    ```python
+                    from Bio import Entrez
+                    Entrez.email = "{pubmed_email}"
+                    handle = Entrez.esearch(db="pubmed", term="{pubmed_query}", retmax={pubmed_max})
+                    record = Entrez.read(handle)
+                    pmids = record["IdList"]
+                    # Fetch details...
+                    ```
+                    """)
+                    st.warning("⚠️ API integration requires additional setup. This is a placeholder showing the implementation approach.")
+
+    with api_tab2:
+        st.markdown("**CrossRef API** - Search scholarly publications by DOI")
+        crossref_query = st.text_input("Search query (author, title, etc.)", key="crossref_q")
+        crossref_max = st.number_input("Max results", min_value=1, max_value=1000, value=100, key="crossref_max")
+
+        if st.button("🔍 Fetch from CrossRef", key="fetch_crossref"):
+            if not crossref_query.strip():
+                st.error("Please enter a search query")
+            else:
+                with st.spinner("Fetching data from CrossRef..."):
+                    st.info(f"""
+                    **API Endpoint:** `https://api.crossref.org/works`
+
+                    **Search Query:** `{crossref_query}`
+
+                    **Max Results:** {crossref_max}
+
+                    **Implementation Steps:**
+                    1. Send GET request with query parameters
+                    2. Parse JSON response
+                    3. Extract: title, authors, journal, date, DOI, citation count
+                    4. Store in papers_deduped table
+
+                    **Required Package:** `pip install requests`
+
+                    **Sample Code:**
+                    ```python
+                    import requests
+                    url = "https://api.crossref.org/works"
+                    params = {{
+                        "query": "{crossref_query}",
+                        "rows": {crossref_max}
+                    }}
+                    response = requests.get(url, params=params)
+                    data = response.json()
+                    # Process results...
+                    ```
+                    """)
+                    st.warning("⚠️ API integration requires additional setup. This is a placeholder showing the implementation approach.")
+
+    with api_tab3:
+        st.markdown("**Europe PMC API** - European biomedical literature database")
+        europepmc_query = st.text_input("Search query", key="europepmc_q")
+        europepmc_max = st.number_input("Max results", min_value=1, max_value=1000, value=100, key="europepmc_max")
+
+        if st.button("🔍 Fetch from Europe PMC", key="fetch_europepmc"):
+            if not europepmc_query.strip():
+                st.error("Please enter a search query")
+            else:
+                with st.spinner("Fetching data from Europe PMC..."):
+                    st.info(f"""
+                    **API Endpoint:** `https://www.ebi.ac.uk/europepmc/webservices/rest/search`
+
+                    **Search Query:** `{europepmc_query}`
+
+                    **Max Results:** {europepmc_max}
+
+                    **Implementation Steps:**
+                    1. Send GET request with query and format=json
+                    2. Parse JSON response
+                    3. Extract: title, authors, journal, date, PMID, DOI, citation count
+                    4. Store in papers_deduped table
+
+                    **Required Package:** `pip install requests`
+
+                    **Sample Code:**
+                    ```python
+                    import requests
+                    url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
+                    params = {{
+                        "query": "{europepmc_query}",
+                        "format": "json",
+                        "pageSize": {europepmc_max}
+                    }}
+                    response = requests.get(url, params=params)
+                    data = response.json()
+                    # Process results...
+                    ```
+                    """)
+                    st.warning("⚠️ API integration requires additional setup. This is a placeholder showing the implementation approach.")
+
+    st.markdown("""
+    ---
+    **📚 API Integration Guide:**
+
+    1. **Install Required Packages:**
+       ```bash
+       pip install biopython requests
+       ```
+
+    2. **Get API Keys (if required):**
+       - PubMed: No key required, email mandatory
+       - CrossRef: No key required, add User-Agent for courtesy
+       - Europe PMC: No key required
+
+    3. **Implementation Status:**
+       - ✅ UI ready
+       - ⚠️ API calls need to be implemented (see code samples above)
+       - 📊 Response parsing logic to be added
+       - 💾 Database integration ready
+
+    4. **Next Steps:**
+       - Implement actual API calls using sample code
+       - Add error handling and rate limiting
+       - Parse responses into DataFrame
+       - Use existing append/merge logic to store data
+    """)
+
+    st.divider()
     st.subheader("Deduplicate FULL 'papers_deduped' → new table")
     new_name = st.text_input("New table name", value="papers_dedup_dc")
     if st.button("Run dedupe (by DOI→PMID→Title)"):
-        full = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
+        full = safe_read_table(conn, "papers_deduped")
         if full.empty:
             st.error("No data in 'papers_deduped'.")
         else:
@@ -389,7 +560,7 @@ def render_data_collection():
 def render_quality():
     st.header("Quality Assessment")
     st.caption("Compute/update quality_score; write back to DB.")
-    df = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
+    df = safe_read_table(conn, "papers_deduped")
     if df.empty:
         st.info("No data in 'papers_deduped'."); return
 
@@ -448,7 +619,7 @@ def render_quality():
 # -------------------------
 def render_analysis():
     st.header("Analysis")
-    df = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
+    df = safe_read_table(conn, "papers_deduped")
     if df.empty:
         st.info("No data in 'papers_deduped'."); return
 
@@ -515,7 +686,7 @@ def render_analysis():
 def render_report():
     st.header("Report Generation")
     st.caption("Generate a multi-page PDF (cover, yearly trend, source mix, top journals, top-cited).")
-    df = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
+    df = safe_read_table(conn, "papers_deduped")
     if df.empty:
         st.info("No data in 'papers_deduped'."); return
     if "publication_date" in df.columns:
@@ -606,7 +777,7 @@ def render_orchestrator_dashboard():
     st.header("🧭 Orchestrator Dashboard")
     st.caption("Filter • Explore • Export • Write-backs • Dry-Run • Append/Merge • PDF")
 
-    df = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
+    df = safe_read_table(conn, "papers_deduped")
     if "publication_date" in df.columns:
         df["year"] = df["publication_date"].apply(parse_year)
     else:
@@ -745,7 +916,7 @@ def render_orchestrator_dashboard():
         with tabA:
             new_name = st.text_input("New table name", value="papers_dedup")
             if st.button("Run dedupe and write", key="dedupe_run"):
-                full = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
+                full = safe_read_table(conn, "papers_deduped")
                 if full.empty: st.error("No data found in 'papers_deduped'.")
                 else:
                     keys = [build_key(r) for _,r in full.iterrows()]
@@ -774,7 +945,7 @@ def render_orchestrator_dashboard():
             thr = st.slider("Quality threshold", min_value=0, max_value=100, value=cfg.quality_threshold, step=1)
             qname = st.text_input("New table name", value=f"papers_quality_ge_{thr}")
             if st.button("Write quality-filtered table", key="quality_run"):
-                full = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
+                full = safe_read_table(conn, "papers_deduped")
                 if "quality_score" not in full.columns: st.error("No 'quality_score' column found.")
                 else:
                     qdf = full[full["quality_score"].fillna(0) >= thr].copy()
@@ -793,7 +964,7 @@ def render_orchestrator_dashboard():
             thr_prev = st.slider("Quality threshold (for Quality action)", min_value=0, max_value=100, value=97, step=1, key="q_prev")
             if st.button("Generate Preview", key="dry_run_btn"):
                 if action == "Deduplicate FULL":
-                    full = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
+                    full = safe_read_table(conn, "papers_deduped")
                     if full.empty:
                         st.info("No rows in papers.")
                         dprev = pd.DataFrame()
@@ -803,7 +974,7 @@ def render_orchestrator_dashboard():
                 elif action == "Materialize FILTERED":
                     dprev = f.copy()
                 else:
-                    full = pd.read_sql_query("SELECT * FROM papers_deduped;", conn)
+                    full = safe_read_table(conn, "papers_deduped")
                     if "quality_score" not in full.columns: st.error("No 'quality_score' column found."); dprev = pd.DataFrame()
                     else: dprev = full[full["quality_score"].fillna(0) >= thr_prev].copy()
                 if dprev.empty: st.info("No rows in resulting DataFrame.")

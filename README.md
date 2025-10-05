@@ -1,15 +1,31 @@
-# Capstone — UCC Bibliometric System (Streamlit + Docker)
+# COVID-19 Bibliometric Analysis Framework
 
-Unified app with an Orchestrator dashboard: filters, KPIs, charts, exports, DB write-backs (dedupe/materialize/quality), Dry-Run SQL preview, Append/Merge by DOI/PMID, and PDF reports.
+**University of Cape Coast | Department of Data Science and Economic Policy**
 
-## Run Locally (no Docker)
+A production-ready Streamlit application for academic bibliometric analysis with institutional branding, API integration capabilities, and comprehensive data management tools.
+
+## Features
+
+✅ **Institutional Branding** - UCC logo, student details, professional sidebar
+✅ **5 Functional Pages** - Dashboard, Analysis, Data Collection, Quality Assessment, Reports
+✅ **API Integration** - PubMed, CrossRef, Europe PMC (UI ready, implementation guide included)
+✅ **Data Management** - CSV import, deduplication, schema fixes, quality scoring
+✅ **Export Formats** - CSV, RIS, BibTeX, PDF reports
+✅ **Database Operations** - Append/merge, deduplicate, quality filtering, dry-run SQL
+✅ **Clean Data** - 454 deduplicated records, fixed schema
+
+## Quick Start
 
 ```powershell
-py -m pip install --upgrade pip
-py -m pip install -r requirements.txt
-# Point to your SQLite DB:
-$env:BIB_DB="C:\\path\\to\\covid_bibliometric_ucc.db"
-py -m streamlit run Capstone.py
+cd C:\Users\eskgy\Desktop\DMA_CAPSTONE
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m streamlit run Capstone.py
+```
+
+Or use the push script:
+```powershell
+# Double-click: 🦇⬆️.bat (auto-commit and push)
 ```
 
 ## Run with Docker
@@ -34,30 +50,82 @@ docker run -it --rm -p 8501:8501 -e BIB_DB=/data/covid_bibliometric_ucc.db -v /a
 
 > Ensure **Packages** visibility in your GitHub user settings allows read access (default OK).
 
-## Repo bootstrap (Windows, PowerShell)
+## Project Structure
 
-1. Create a new repo on GitHub under your account: **eskgyimah/Capstone** (public or private). Keep it **empty** (no README, no .gitignore).  
-2. Then run:
-
-```powershell
-cd "C:\Users\eskgy\Desktop\CAPSTONE\CHATGPT"
-mkdir CapstoneRepo
-Copy-Item -Path ".\*" -Include Capstone.py, requirements.txt, Dockerfile, .dockerignore, .gitignore -Destination ".\CapstoneRepo" -Force
-Copy-Item -Path ".\.streamlit" -Destination ".\CapstoneRepo" -Recurse -Force
-Copy-Item -Path ".\.github" -Destination ".\CapstoneRepo" -Recurse -Force
-
-cd CapstoneRepo
-git init
-git branch -m main
-git add .
-git -c user.name="Edd" -c user.email="edward.gyimah002@stu.ucc.edu.gh" commit -m "Initial commit: Capstone app + Docker + GH Actions"
-git remote add origin https://github.com/eskgyimah/Capstone.git
-git push -u origin main
+```
+C:\Users\eskgy\Desktop\DMA_CAPSTONE\
+├── Capstone.py              # Main Streamlit application
+├── UCC_Logo.png             # Institution logo
+├── covid_bibliometric_ucc.db # SQLite database (454 deduplicated records)
+├── 🦇⬆️.bat                  # Git push automation script
+├── deduplicate.py           # Deduplication utility
+├── fix_schema.py            # Schema repair tool
+├── requirements.txt         # Python dependencies
+├── Dockerfile              # Docker configuration
+├── .gitignore              # Git ignore rules
+├── README.md               # This file
+└── reports/                # Generated PDF reports
 ```
 
-After the push, Actions will build and publish `ghcr.io/eskgyimah/capstone:latest`.
+## Documentation
+
+- **BRANDING_COMPLETE.md** - Institutional branding implementation
+- **FIXES_SUMMARY.md** - Database schema fixes
+- **OPTION_A_APPLIED.md** - Deduplication approach
+- **UI_IMPROVEMENTS.md** - UI enhancements
+
+## Git Workflow
+
+Already set up and connected to: **https://github.com/eskgyimah/Capstone.git**
+
+To push changes:
+```powershell
+# Method 1: Use the automation script
+.\🦇⬆️.bat
+
+# Method 2: Manual git commands
+git add .
+git commit -m "Your message"
+git push
+```
+
+## API Integration
+
+The Data Collection page includes UI for three major academic APIs:
+
+1. **PubMed API** - Biomedical literature (NCBI)
+2. **CrossRef API** - Scholarly publications with DOI
+3. **Europe PMC API** - European biomedical database
+
+**Status:** UI ready, implementation guide included in-app
+
+**To implement:**
+```bash
+pip install biopython requests
+```
+
+See in-app documentation (📁 Data Collection → 🔌 API Data Collection) for sample code and integration steps.
 
 ## Notes
-- Default DB path uses the `BIB_DB` env var; set it when running locally or in Docker.
-- The PDF report writes to `reports/` inside the container (non-persistent unless you mount a volume). For persistence: `-v /host/reports:/app/reports`.
-- To change the Streamlit theme or port, edit `.streamlit/config.toml` or pass `-e PORT=8501` to Docker.
+
+- Default DB path: `covid_bibliometric_ucc.db` (454 deduplicated records)
+- PDF reports saved to `reports/` directory
+- All paths use Windows format: `C:\Users\eskgy\Desktop\DMA_CAPSTONE\`
+- UCC institutional branding fully integrated
+
+---
+
+## Author
+
+**Edward Solomon Kweku Gyimah**
+- Student ID: SE/DAT/24/0007
+- Email: edward.gyimah002@stu.ucc.edu.gh
+- Programme: MSc Social Science Data Management & Analysis
+- Institution: University of Cape Coast
+- Department: Data Science and Economic Policy
+
+**Submission:** October 2025
+
+---
+
+**Repository:** https://github.com/eskgyimah/Capstone
