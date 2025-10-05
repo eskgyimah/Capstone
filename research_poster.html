@@ -5,9 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COVID-19 Bibliometric Analysis Framework - Research Poster</title>
     <style>
+        /* Print-specific settings */
         @page {
-            size: A0 portrait;
+            size: A0 portrait; /* 841mm × 1189mm */
             margin: 0;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .poster {
+                width: 841mm !important;
+                height: 1189mm !important;
+                max-width: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+
+            .no-print {
+                display: none !important;
+            }
         }
 
         * {
@@ -23,11 +45,59 @@
         }
 
         .poster {
-            width: 841px; /* A0 width scaled to screen */
+            width: 841px; /* A0 width scaled for screen (841px = 841mm at 96 DPI) */
             max-width: 100%;
             margin: 0 auto;
             background: white;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        /* Print controls */
+        .print-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .print-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .print-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .size-info {
+            font-size: 0.85em;
+            color: #718096;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 5px;
+        }
+
+        .size-info strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
         }
 
         /* Header */
@@ -355,6 +425,26 @@
     </style>
 </head>
 <body>
+    <!-- Print Controls -->
+    <div class="print-controls no-print">
+        <button class="print-btn" onclick="window.print()">🖨️ Print Poster</button>
+        <button class="print-btn" onclick="downloadPDF()" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">📄 Save as PDF</button>
+        <div class="size-info">
+            <strong>Print Settings:</strong>
+            Paper: A0 (841 × 1189 mm)<br>
+            Orientation: Portrait<br>
+            Margins: None<br>
+            Scale: 100%
+        </div>
+        <div class="size-info" style="margin-top: 10px;">
+            <strong>Tips:</strong>
+            • Use Chrome/Edge for best results<br>
+            • Select "Save as PDF" as printer<br>
+            • Disable headers/footers<br>
+            • Check "Background graphics"
+        </div>
+    </div>
+
     <div class="poster">
         <!-- Header -->
         <div class="header">
@@ -737,6 +827,55 @@
                 window.print();
             }
         });
+
+        function downloadPDF() {
+            // Show print dialog with instructions
+            alert('To save as PDF:\n\n1. In the print dialog, select "Save as PDF" or "Microsoft Print to PDF" as your printer\n2. Click "Save" or "Print"\n3. Choose a location and filename\n4. Your poster will be saved as a high-quality PDF ready for printing\n\nRecommended settings:\n• Paper: A0 (841 × 1189 mm)\n• Orientation: Portrait\n• Margins: None\n• Scale: 100%\n• Background graphics: Enabled');
+            window.print();
+        }
+
+        // Add visual feedback for print-ready status
+        window.addEventListener('load', () => {
+            console.log('Poster loaded successfully');
+            console.log('Dimensions: A0 Portrait (841mm × 1189mm)');
+            console.log('Ready for professional printing');
+
+            // Add watermark for screen view only
+            if (!window.matchMedia('print').matches) {
+                const watermark = document.createElement('div');
+                watermark.className = 'no-print';
+                watermark.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(102, 126, 234, 0.9);
+                    color: white;
+                    padding: 15px 30px;
+                    border-radius: 25px;
+                    font-size: 0.9em;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                    z-index: 999;
+                `;
+                watermark.innerHTML = '📏 A0 Format (841 × 1189 mm) • Ready for Professional Printing';
+                document.body.appendChild(watermark);
+            }
+        });
+
+        // Dimensions check
+        function checkPosterDimensions() {
+            const poster = document.querySelector('.poster');
+            const width = poster.offsetWidth;
+            const height = poster.offsetHeight;
+
+            console.log(`Current poster dimensions: ${width}px × ${height}px`);
+            console.log(`Target print dimensions: 841mm × 1189mm (A0)`);
+            console.log(`At 300 DPI: 9933px × 14043px`);
+            console.log(`At 150 DPI: 4967px × 7022px`);
+        }
+
+        // Log dimensions on load
+        window.addEventListener('load', checkPosterDimensions);
     </script>
 </body>
 </html>
