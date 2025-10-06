@@ -522,48 +522,82 @@
                 <h2>🏗️ System Architecture</h2>
             </div>
             <div class="content">
-                <div class="architecture-diagram">
-                    <div class="arch-layer">
-                        <div class="arch-box">
-                            <h4>📁 Data Layer</h4>
-                            <p>CSV Import • API Integration</p>
-                        </div>
-                        <div class="arch-box">
-                            <h4>🔄 Processing Layer</h4>
-                            <p>Deduplication • Validation</p>
-                        </div>
-                        <div class="arch-box">
-                            <h4>💾 Storage Layer</h4>
-                            <p>SQLite Database</p>
-                        </div>
-                    </div>
-                    <div class="arch-layer">
-                        <div class="arch-box">
-                            <h4>✅ Quality Layer</h4>
-                            <p>Scoring • Filtering</p>
-                        </div>
-                        <div class="arch-box">
-                            <h4>📊 Analysis Layer</h4>
-                            <p>Visualization • Statistics</p>
-                        </div>
-                        <div class="arch-box">
-                            <h4>📄 Output Layer</h4>
-                            <p>Reports • Exports</p>
-                        </div>
-                    </div>
-                </div>
+                <h3 style="text-align: center; margin-bottom: 20px; color: #4a5568;">Multi-Layer Design with Data Flow</h3>
 
-                <h3 style="margin-top: 30px;">Technology Stack</h3>
-                <div class="tech-stack">
-                    <span class="tech-badge">Python 3.11</span>
-                    <span class="tech-badge">Streamlit</span>
-                    <span class="tech-badge">SQLite</span>
-                    <span class="tech-badge">Pandas</span>
-                    <span class="tech-badge">Matplotlib</span>
-                    <span class="tech-badge">Plotly</span>
-                    <span class="tech-badge">Biopython</span>
-                    <span class="tech-badge">Docker</span>
-                    <span class="tech-badge">GitHub Actions</span>
+                <div style="display: flex; flex-direction: column; gap: 15px; max-width: 900px; margin: 0 auto;">
+                    <!-- Input Layer -->
+                    <div style="text-align: center;">
+                        <div style="display: inline-block; background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%); color: white; padding: 15px 40px; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+                            Query Request
+                        </div>
+                        <div style="font-size: 2em; color: #DC143C; margin: 5px 0;">↓</div>
+                    </div>
+
+                    <!-- API Layer -->
+                    <div style="background: #f7fafc; padding: 20px; border-radius: 10px; border: 2px solid #e2e8f0;">
+                        <h4 style="text-align: center; color: #2d3748; margin-bottom: 15px;">📡 Data Collection - 4 APIs</h4>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                            <div style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 0.9em; font-weight: 600;">PubMed</div>
+                            <div style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 0.9em; font-weight: 600;">CrossRef</div>
+                            <div style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 0.9em; font-weight: 600;">Europe PMC</div>
+                            <div style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 0.9em; font-weight: 600;">bioRxiv</div>
+                        </div>
+                        <div style="font-size: 2em; color: #DC143C; margin: 5px 0; text-align: center;">↓</div>
+                    </div>
+
+                    <!-- Validation Layer -->
+                    <div style="background: #fff5e6; padding: 20px; border-radius: 10px; border: 2px solid #FFD700;">
+                        <h4 style="text-align: center; color: #2d3748; margin-bottom: 15px;">✅ Validation & Quality Score</h4>
+                        <div style="display: flex; justify-content: center; gap: 30px; align-items: center;">
+                            <div style="text-align: center;">
+                                <div style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 12px 25px; border-radius: 8px; font-weight: bold; margin-bottom: 5px;">Pass</div>
+                                <div style="color: #38a169; font-size: 1.1em; font-weight: bold;">≥97</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="background: linear-gradient(135deg, #DC143C 0%, #b91c1c 100%); color: white; padding: 12px 25px; border-radius: 8px; font-weight: bold; margin-bottom: 5px;">Fail</div>
+                                <div style="color: #DC143C; font-size: 1.1em; font-weight: bold;">&lt;97</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size: 2em; color: #DC143C; margin: 0; text-align: center;">↓</div>
+
+                    <!-- Processing Layer -->
+                    <div style="display: flex; gap: 20px;">
+                        <div style="flex: 1; background: #fee; padding: 15px; border-radius: 10px; border: 2px solid #DC143C; text-align: center;">
+                            <h4 style="color: #DC143C; margin-bottom: 8px;">🚫 Reject & Log</h4>
+                            <p style="font-size: 0.9em; color: #666;">Failed validation records</p>
+                        </div>
+                        <div style="flex: 1; background: #f0fdf4; padding: 15px; border-radius: 10px; border: 2px solid #38a169; text-align: center;">
+                            <h4 style="color: #38a169; margin-bottom: 8px;">⭐ High Quality Review</h4>
+                            <p style="font-size: 0.9em; color: #666;">Passed validation records</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 2em; color: #DC143C; margin: 0; text-align: center;">↓</div>
+
+                    <!-- Database Layer -->
+                    <div style="text-align: center;">
+                        <div style="display: inline-block; background: linear-gradient(135deg, #1E3A8A 0%, #3b82f6 100%); color: white; padding: 15px 50px; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+                            💾 SQLite Database
+                        </div>
+                        <div style="font-size: 2em; color: #DC143C; margin: 5px 0;">↓</div>
+                    </div>
+
+                    <!-- Analysis Layer -->
+                    <div style="background: #f7fafc; padding: 15px; border-radius: 10px; border: 2px solid #667eea; text-align: center;">
+                        <h4 style="color: #667eea; margin-bottom: 8px;">📊 Analysis Layer</h4>
+                        <p style="font-size: 0.9em; color: #666;">Statistical analysis, trends, insights</p>
+                    </div>
+                    <div style="font-size: 2em; color: #DC143C; margin: 0; text-align: center;">↓</div>
+
+                    <!-- Outputs -->
+                    <div style="background: #fff5e6; padding: 20px; border-radius: 10px; border: 2px solid #FFD700;">
+                        <h4 style="text-align: center; color: #2d3748; margin-bottom: 15px;">📤 Outputs</h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 0.9em; font-weight: 600;">Dashboard</div>
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 0.9em; font-weight: 600;">Charts</div>
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 0.9em; font-weight: 600;">Exports</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
