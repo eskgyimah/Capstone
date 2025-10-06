@@ -179,41 +179,62 @@
         }
 
         .navigation {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 20px;
-            align-items: center;
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            pointer-events: none;
         }
 
         .nav-button {
             background: #667eea;
             color: white;
             border: none;
-            padding: 15px 20px;
+            padding: 20px 18px;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 1.5em;
+            font-size: 2em;
             transition: all 0.3s;
-            min-width: 50px;
+            min-width: 60px;
             font-weight: bold;
+            pointer-events: auto;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #prevBtn {
+            left: 30px;
+        }
+
+        #nextBtn {
+            right: 30px;
         }
 
         .nav-button:hover {
             background: #764ba2;
-            transform: scale(1.05);
+            transform: translateY(-50%) scale(1.1);
         }
 
         .nav-button:disabled {
             background: #cbd5e0;
             cursor: not-allowed;
+            opacity: 0.5;
         }
 
         .slide-counter {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
             color: #718096;
             font-size: 1em;
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .logo {
@@ -881,8 +902,8 @@
         <!-- Navigation -->
         <div class="navigation">
             <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">←</button>
-            <span class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">10</span></span>
             <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">→</button>
+            <div class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">10</span></div>
         </div>
     </div>
 
