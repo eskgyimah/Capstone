@@ -6,6 +6,14 @@
 
 ---
 
+## 🔗 **Quick Access (Short Link)**
+
+### **https://bit.ly/3WQcyN6**
+
+Share this link for instant access to all presentations!
+
+---
+
 ## 📊 View Presentations
 
 ### 🌐 **Live Presentations (Click to View)**
