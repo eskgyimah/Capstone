@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone Defense Presentation - Edward Gyimah</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .logo {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #1E3A8A;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #DC143C;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .info {
+            background: #f7fafc;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #1E3A8A;
+        }
+
+        .info h2 {
+            color: #1E3A8A;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .info p {
+            color: #4a5568;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+
+        .info strong {
+            color: #DC143C;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-html {
+            background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+            color: white;
+        }
+
+        .btn-html:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+        }
+
+        .btn-pptx {
+            background: linear-gradient(135deg, #DC143C 0%, #FF6B6B 100%);
+            color: white;
+        }
+
+        .btn-pptx:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(220, 20, 60, 0.4);
+        }
+
+        .icon {
+            font-size: 1.3em;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+            color: #718096;
+            font-size: 0.95em;
+        }
+
+        .footer a {
+            color: #1E3A8A;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 1.1em;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>🎓 Capstone Defense Presentation</h1>
+        </div>
+
+        <div class="subtitle">
+            A Comprehensive Bibliometric Analysis of COVID-19 Research Publications
+        </div>
+
+        <div class="info">
+            <h2>Presentation Details</h2>
+            <p><strong>Student:</strong> Edward Solomon Kweku Gyimah</p>
+            <p><strong>Student ID:</strong> SE/DAT/24/0007</p>
+            <p><strong>Program:</strong> MSc Social Science Data Management & Analysis</p>
+            <p><strong>Supervisor:</strong> Dr. William Cantah</p>
+            <p><strong>Institution:</strong> University of Cape Coast</p>
+            <p><strong>Centre:</strong> Data Archiving, Management, Analysis and Advocacy</p>
+            <p><strong>Defense Date:</strong> October 21, 2025 | 9:00 AM - 1:00 PM</p>
+        </div>
+
+        <h2 style="color: #1E3A8A; margin-bottom: 20px; font-size: 1.8em;">
+            Choose Presentation Format
+        </h2>
+
+        <div class="buttons">
+            <a href="PRESENTATION/CAPSTONE_PRESENTATION.html" class="btn btn-html" target="_blank">
+                <span class="icon">🌐</span>
+                <span>View HTML Presentation<br><small style="font-size: 0.8em; opacity: 0.9;">(Interactive Web Version)</small></span>
+            </a>
+
+            <a href="https://view.officeapps.live.com/op/view.aspx?src=https://eskgyimah.github.io/Capstone/PRESENTATION/CAPSTONE_PRESENTATION.pptx" class="btn btn-pptx" target="_blank">
+                <span class="icon">📊</span>
+                <span>View PowerPoint<br><small style="font-size: 0.8em; opacity: 0.9;">(Online Viewer)</small></span>
+            </a>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a href="https://github.com/eskgyimah/Capstone/raw/main/PRESENTATION/CAPSTONE_PRESENTATION.pptx"
+               style="display: inline-block; padding: 15px 30px; background: #f7fafc; color: #1E3A8A;
+                      text-decoration: none; border-radius: 8px; font-weight: 600; border: 2px solid #1E3A8A;
+                      transition: all 0.3s;">
+                ⬇️ Download PowerPoint (.pptx)
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>Research Summary:</strong> Analysis of 472 peer-reviewed COVID-19 publications (2020-2024)
+                across 281 unique journals with mean quality score of 97.52/100
+            </p>
+            <p style="margin-top: 15px;">
+                <a href="https://github.com/eskgyimah/Capstone" target="_blank">📁 View Full Repository on GitHub</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
