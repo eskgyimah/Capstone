@@ -14,8 +14,8 @@
 |--------|------|-------------|
 | **🏠 Landing Page** | [**eskgyimah.github.io/Capstone**](https://eskgyimah.github.io/Capstone/) | Main access point with all options |
 | **🌐 HTML Version** | [View Interactive Presentation](https://eskgyimah.github.io/Capstone/PRESENTATION/CAPSTONE_PRESENTATION.html) | Full interactive web presentation |
-| **📊 PowerPoint** | [View in Office Online](https://view.officeapps.live.com/op/view.aspx?src=https://eskgyimah.github.io/Capstone/PRESENTATION/CAPSTONE_PRESENTATION.pptx) | PowerPoint viewer (no download needed) |
-| **⬇️ Download PPTX** | [Download PowerPoint](https://github.com/eskgyimah/Capstone/raw/main/PRESENTATION/CAPSTONE_PRESENTATION.pptx) | Download for offline use |
+| **📊 PowerPoint** | [View in Google Docs](https://docs.google.com/viewer?url=https://github.com/eskgyimah/Capstone/raw/main/PRESENTATION/CAPSTONE_PRESENTATION.pptx) | PowerPoint viewer (no download needed) |
+| **⬇️ Download** | [Download PowerPoint](https://eskgyimah.github.io/Capstone/PRESENTATION/CAPSTONE_PRESENTATION.pptx) | Download for offline use |
 
 ---
 
