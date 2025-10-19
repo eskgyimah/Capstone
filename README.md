@@ -1,149 +1,302 @@
-# COVID-19 Bibliometric Analysis Framework
+# 🎓 Capstone Defense Presentation
 
-**University of Cape Coast | Department of Data Science and Economic Policy**
+## A Comprehensive Bibliometric Analysis of COVID-19 Research Publications
 
-A production-ready Streamlit application for academic bibliometric analysis with institutional branding, API integration capabilities, and comprehensive data management tools.
-
-## Features
-
-✅ **Institutional Branding** - UCC logo, student details, professional sidebar
-✅ **5 Functional Pages** - Dashboard, Analysis, Data Collection, Quality Assessment, Reports
-✅ **API Integration** - PubMed, CrossRef, Europe PMC (UI ready, implementation guide included)
-✅ **Data Management** - CSV import, deduplication, schema fixes, quality scoring
-✅ **Export Formats** - CSV, RIS, BibTeX, PDF reports
-✅ **Database Operations** - Append/merge, deduplicate, quality filtering, dry-run SQL
-✅ **Clean Data** - 454 deduplicated records, fixed schema
-
-## Quick Start
-
-```powershell
-cd C:\Users\eskgy\Desktop\DMA_CAPSTONE
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m streamlit run Capstone.py
-```
-
-Or use the push script:
-```powershell
-# Double-click: 🦇⬆️.bat (auto-commit and push)
-```
-
-## Run with Docker
-
-```powershell
-docker build -t capstone:latest .
-# mount your DB into /data and point the env var:
-docker run -it --rm -p 8501:8501 -e BIB_DB=/data/covid_bibliometric_ucc.db -v "C:\\path\\to\\dbfolder:/data" capstone:latest
-```
-
-Open: http://localhost:8501
-
-## GitHub Actions → GHCR
-
-On push to `main`, CI builds and pushes a multi-arch image to **ghcr.io/OWNER/capstone**.
-
-To pull and run:
-```bash
-docker pull ghcr.io/OWNER/capstone:latest
-docker run -it --rm -p 8501:8501 -e BIB_DB=/data/covid_bibliometric_ucc.db -v /abs/path/to/db:/data ghcr.io/OWNER/capstone:latest
-```
-
-> Ensure **Packages** visibility in your GitHub user settings allows read access (default OK).
-
-## Project Structure
-
-```
-C:\Users\eskgy\Desktop\DMA_CAPSTONE\
-├── Capstone.py              # Main Streamlit application
-├── UCC_Logo.png             # Institution logo
-├── covid_bibliometric_ucc.db # SQLite database (454 deduplicated records)
-├── 🦇⬆️.bat                  # Git push automation script
-├── deduplicate.py           # Deduplication utility
-├── fix_schema.py            # Schema repair tool
-├── requirements.txt         # Python dependencies
-├── Dockerfile              # Docker configuration
-├── .gitignore              # Git ignore rules
-├── README.md               # This file
-├── defense_presentation.html # HTML defense presentation (10 slides)
-├── research_poster.html    # Research poster (A0 format)
-├── API_DOCUMENTATION.md    # Complete API integration guide
-└── reports/                # Generated PDF reports
-```
-
-## Documentation
-
-- **BRANDING_COMPLETE.md** - Institutional branding implementation
-- **FIXES_SUMMARY.md** - Database schema fixes
-- **OPTION_A_APPLIED.md** - Deduplication approach
-- **UI_IMPROVEMENTS.md** - UI enhancements
-- **API_DOCUMENTATION.md** - Complete API integration guide
-
-## Defense Materials
-
-### HTML Defense Presentation
-- **File:** `defense_presentation.html`
-- **Format:** 10 interactive slides
-- **Features:** Keyboard navigation (arrow keys), modern design, UCC branding
-- **Open with:** Any web browser (Chrome, Firefox, Edge)
-
-### Research Poster
-- **File:** `research_poster.html`
-- **Format:** A0 portrait (printable)
-- **Features:** Comprehensive sections, statistics, tables, professional layout
-- **Print:** Open in browser and press Ctrl+P for PDF export
-
-## Git Workflow
-
-Already set up and connected to: **https://github.com/eskgyimah/Capstone.git**
-
-To push changes:
-```powershell
-# Method 1: Use the automation script
-.\🦇⬆️.bat
-
-# Method 2: Manual git commands
-git add .
-git commit -m "Your message"
-git push
-```
-
-## API Integration
-
-The Data Collection page includes UI for three major academic APIs:
-
-1. **PubMed API** - Biomedical literature (NCBI)
-2. **CrossRef API** - Scholarly publications with DOI
-3. **Europe PMC API** - European biomedical database
-
-**Status:** UI ready, implementation guide included in-app
-
-**To implement:**
-```bash
-pip install biopython requests
-```
-
-See in-app documentation (📁 Data Collection → 🔌 API Data Collection) for sample code and integration steps.
-
-## Notes
-
-- Default DB path: `covid_bibliometric_ucc.db` (454 deduplicated records)
-- PDF reports saved to `reports/` directory
-- All paths use Windows format: `C:\Users\eskgy\Desktop\DMA_CAPSTONE\`
-- UCC institutional branding fully integrated
+**Patterns, Quality, and Global Scientific Response (2020-2024)**
 
 ---
 
-## Author
+## 📊 View Presentations
+
+### 🌐 **Live Presentations (Click to View)**
+
+| Format | Link | Description |
+|--------|------|-------------|
+| **🏠 Landing Page** | [**eskgyimah.github.io/Capstone**](https://eskgyimah.github.io/Capstone/) | Main access point with all options |
+| **🌐 HTML Version** | [View Interactive Presentation](https://eskgyimah.github.io/Capstone/PRESENTATION/CAPSTONE_PRESENTATION.html) | Full interactive web presentation |
+| **📊 PowerPoint** | [View in Office Online](https://view.officeapps.live.com/op/view.aspx?src=https://eskgyimah.github.io/Capstone/PRESENTATION/CAPSTONE_PRESENTATION.pptx) | PowerPoint viewer (no download needed) |
+| **⬇️ Download PPTX** | [Download PowerPoint](https://github.com/eskgyimah/Capstone/raw/main/PRESENTATION/CAPSTONE_PRESENTATION.pptx) | Download for offline use |
+
+---
+
+## 👨‍🎓 Student Information
+
+- **Name:** Edward Solomon Kweku Gyimah
+- **Student ID:** SE/DAT/24/0007
+- **Email:** edward.gyimah002@stu.ucc.edu.gh
+- **Program:** MSc Social Science Data Management & Analysis
+- **Institution:** University of Cape Coast
+- **School:** School of Development Studies
+- **Centre:** Data Archiving, Management, Analysis and Advocacy
+
+## 👨‍🏫 Supervision
+
+- **Supervisor:** Dr. William Cantah
+- **Department:** Centre for Data Archiving, Management, Analysis and Advocacy
+
+## 📅 Defense Details
+
+- **Date:** October 21, 2025
+- **Time:** 9:00 AM - 1:00 PM
+- **Duration:** 20 Minutes + Q&A
+- **Location:** University of Cape Coast
+
+---
+
+## 📚 Research Overview
+
+### Objective
+Systematic bibliometric analysis of COVID-19 research publications to understand patterns, quality, and the global scientific response from 2020 through 2024.
+
+### Dataset
+- **Total Publications:** 472 peer-reviewed papers
+- **Time Period:** 2020-2024 (5 years)
+- **Unique Journals:** 281
+- **COVID-era Publications:** 450 (95.3%)
+- **PubMed IDs:** 429 (90.9%)
+
+### Key Findings
+
+#### 🎯 Quality Assessment
+- **Mean Quality Score:** 97.52/100 (SD = 1.32)
+- **Score Range:** 94.75 - 100.0
+- **Exceptional (99-100):** 47 papers (10.0%)
+- **Excellent (97-99):** 291 papers (61.7%)
+- **Very Good (95-97):** 124 papers (26.3%)
+- **Good (94.75-95):** 10 papers (2.1%)
+
+#### 📈 Temporal Trends
+| Year | Publications | % of Total | Mean Quality |
+|------|-------------|------------|--------------|
+| 2020 | 163 | 36.2% | 97.02 |
+| 2021 | 100 | 22.2% | 97.52 |
+| 2022 | 90 | 20.0% | 97.50 |
+| 2023 | 69 | 15.3% | 98.18 |
+| 2024 | 28 | 6.2% | 98.79 |
+
+**Key Pattern:** Volume peaked in 2020 (acute crisis phase), quality improved inversely over time
+
+#### 📰 Top Publication Venues
+1. **arXiv** (Preprint): 40 papers (8.5%)
+2. **NEJM**: 20 papers (4.2%)
+3. **The Lancet**: 17 papers (3.6%)
+4. **Nature**: 13 papers (2.8%)
+5. **JAMA**: 8 papers (1.7%)
+
+**Notable:** 281 unique journals demonstrate remarkable disciplinary diversity
+
+---
+
+## 🔬 Methodology
+
+### Quality Assessment Framework
+Five-dimensional 100-point scoring system:
+
+| Dimension | Weight | Focus Areas |
+|-----------|--------|-------------|
+| **Methodological Rigor** | 30% | Study design, sample size, statistical analysis, bias control |
+| **Reproducibility** | 20% | Methods detail, data availability, protocol transparency |
+| **Scientific Contribution** | 25% | Novelty, clinical relevance, knowledge advancement |
+| **Reporting Quality** | 15% | PRISMA and STROBE standards adherence |
+| **Journal Standing** | 10% | Reputation and editorial standards |
+
+---
+
+## 💡 Principal Findings
+
+### 1. **Sustained Quality Under Pressure**
+Mean quality score of 97.52 maintained across 281 journals and 5 years, challenging concerns about compromised standards during rapid publication.
+
+### 2. **Distinct Temporal Patterns**
+- 2020 peak (36% of all publications) coinciding with acute crisis
+- Progressive decline through 2024 (6%)
+- Quality improved inversely: 97.02 → 98.79
+
+### 3. **Remarkable Disciplinary Diversity**
+281 unique journals spanning medicine, social sciences, economics, and psychology, though creating knowledge synthesis challenges.
+
+### 4. **Evolution of Scholarly Communication**
+- Substantial preprint adoption (9.1%)
+- Robust open-access performance
+- Pandemic-driven shifts in dissemination practices
+
+---
+
+## 📑 Presentation Contents
+
+### Slide Breakdown (10 Slides Total)
+
+1. **Title Slide** - Project overview and institutional details
+2. **Study Overview** - Research scope and objectives
+3. **Research Questions** - Four fundamental questions addressed
+4. **Methodology** - Quality framework and dataset characteristics
+5. **Quality Results** - Distribution and assessment findings (with pie chart)
+6. **Temporal Trends** - Year-by-year analysis (with bar+line chart)
+7. **Journal Distribution** - Top venues and patterns (with bar chart)
+8. **Principal Findings** - Four major discoveries
+9. **Discussion & Implications** - Theoretical contributions and recommendations
+10. **Conclusions & Q&A** - Summary and question period
+
+### Features
+- ✅ 3 professional data visualization charts
+- ✅ Complete narrative notes for all slides
+- ✅ UCC branding and color scheme
+- ✅ Auto-fit text for optimal display
+- ✅ Publication-ready quality
+
+---
+
+## 📊 Data Visualizations
+
+### Charts Included:
+1. **Quality Distribution Pie Chart** - Breakdown across 4 quality categories
+2. **Temporal Trends Chart** - Dual-axis showing volume (bars) and quality (line) over time
+3. **Journal Distribution Chart** - Top 5 venues + others, color-coded by importance
+
+All charts optimized for:
+- High-resolution display (150 DPI)
+- Professional color scheme (UCC Blue, Crimson, Gold)
+- Clear, non-overlapping labels
+- Accessibility and readability
+
+---
+
+## 🎯 Research Contributions
+
+### Theoretical
+- Empirical evidence that scientific institutions can adapt to emergencies while preserving quality
+- Speed-rigor relationship depends on institutional capacity
+
+### Practical Recommendations
+1. **Codify rapid research mechanisms** - Preprint infrastructure and fast-track peer review
+2. **Support sustained investigation** - Beyond acute phases to maintain momentum
+3. **Enhance knowledge synthesis** - Robust aggregation across fragmented journals
+4. **Accelerate open science transitions** - Validated preprints and open-access models
+
+### Policy Implications
+Evidence-based recommendations for:
+- Future pandemic preparedness
+- Research funding allocation
+- Crisis-driven knowledge production
+- Scholarly communication evolution
+
+---
+
+## 📂 Repository Structure
+
+```
+Capstone/
+├── index.html                              # Landing page
+├── PRESENTATION/
+│   ├── CAPSTONE_PRESENTATION.html         # Interactive HTML presentation
+│   ├── CAPSTONE_PRESENTATION.pptx         # PowerPoint with charts & notes
+│   └── slide_narratives.md                # Full presentation script
+├── DATA/                                   # Research data
+├── FIGURES/                                # Charts and visualizations
+├── MANUSCRIPTS/                            # Written reports
+└── README.md                               # This file
+```
+
+---
+
+## 🛠️ Technical Details
+
+### PowerPoint Specifications
+- **Slides:** 10 total
+- **Format:** .pptx (Microsoft PowerPoint)
+- **Charts:** 3 embedded (PNG, 150 DPI)
+- **Notes:** Full narrative on all slides
+- **Compatibility:** PowerPoint 2016+, Office 365, Google Slides
+
+### HTML Presentation
+- **Framework:** Vanilla HTML5/CSS3/JavaScript
+- **Responsive:** Mobile, tablet, desktop optimized
+- **Features:** Speaker notes panel, navigation controls, auto-advance option
+- **Browser Support:** Chrome, Firefox, Safari, Edge
+
+### Data Visualization
+- **Tool:** Matplotlib with constrained_layout
+- **Resolution:** 150 DPI
+- **Format:** PNG embedded in presentations
+- **Color Scheme:** UCC institutional colors
+
+---
+
+## 📖 How to Use
+
+### For Defense Committee
+1. **View Online:** Click the [Landing Page](https://eskgyimah.github.io/Capstone/) link
+2. **Choose Format:** HTML for interactive features or PowerPoint for traditional viewing
+3. **Notes Available:** Speaker notes included in PowerPoint (View → Notes Page)
+
+### For Download
+```bash
+# Clone repository
+git clone https://github.com/eskgyimah/Capstone.git
+
+# Navigate to presentation
+cd Capstone/PRESENTATION
+
+# Open HTML version
+start CAPSTONE_PRESENTATION.html
+
+# Or open PowerPoint
+start CAPSTONE_PRESENTATION.pptx
+```
+
+---
+
+## 📞 Contact
 
 **Edward Solomon Kweku Gyimah**
-- Student ID: SE/DAT/24/0007
-- Email: edward.gyimah002@stu.ucc.edu.gh
-- Programme: MSc Social Science Data Management & Analysis
-- Institution: University of Cape Coast
-- Department: Data Science and Economic Policy
+- 📧 Email: edward.gyimah002@stu.ucc.edu.gh
+- 🎓 Student ID: SE/DAT/24/0007
+- 🏛️ Institution: University of Cape Coast
+- 📍 Location: Cape Coast, Ghana
 
-**Submission:** October 2025
+**Supervisor: Dr. William Cantah**
+- 🏢 Centre for Data Archiving, Management, Analysis and Advocacy
+- 🏛️ University of Cape Coast
 
 ---
 
-**Repository:** https://github.com/eskgyimah/Capstone
+## 📄 License & Attribution
+
+This capstone project is submitted in partial fulfillment of the requirements for the degree of Master of Science in Social Science Data Management and Analysis at the University of Cape Coast.
+
+**© 2025 Edward Solomon Kweku Gyimah**
+
+---
+
+## 🙏 Acknowledgments
+
+- **Supervisor:** Dr. William Cantah for guidance and mentorship
+- **Centre for Data Archiving, Management, Analysis and Advocacy** for resources and support
+- **University of Cape Coast** for academic framework
+- **COVID-19 Research Community** for the data corpus analyzed
+
+---
+
+## 📅 Important Dates
+
+- **Submission Deadline:** October 2025
+- **Defense Date:** October 21, 2025
+- **Defense Time:** 9:00 AM - 1:00 PM
+- **Presentation Duration:** 20 minutes + Q&A
+
+---
+
+## 🔗 Quick Links
+
+- 🏠 [Landing Page](https://eskgyimah.github.io/Capstone/)
+- 🌐 [HTML Presentation](https://eskgyimah.github.io/Capstone/PRESENTATION/CAPSTONE_PRESENTATION.html)
+- 📊 [PowerPoint Viewer](https://view.officeapps.live.com/op/view.aspx?src=https://eskgyimah.github.io/Capstone/PRESENTATION/CAPSTONE_PRESENTATION.pptx)
+- ⬇️ [Download PPTX](https://github.com/eskgyimah/Capstone/raw/main/PRESENTATION/CAPSTONE_PRESENTATION.pptx)
+- 📁 [GitHub Repository](https://github.com/eskgyimah/Capstone)
+
+---
+
+**Last Updated:** October 19, 2025
+**Status:** ✅ Ready for Defense
+
+🎓 **University of Cape Coast | Centre for Data Archiving, Management, Analysis and Advocacy**
