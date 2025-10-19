@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVID-19 Bibliometric Analysis Framework - Defense Presentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#1E3A8A', primaryTextColor: '#fff', primaryBorderColor: '#DC143C', lineColor: '#DC143C', secondaryColor: '#FFD700' } });
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%);
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-right: 300px;
+        }
+
+        .slide {
+            display: none;
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-header {
+            border-bottom: 3px solid #1E3A8A;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #1E3A8A;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: #4a5568;
+            font-size: 1.5em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.2em;
+        }
+
+        .content {
+            font-size: 1.05em;
+            line-height: 1.7;
+            color: #4a5568;
+            overflow-y: auto;
+            max-height: calc(90vh - 220px);
+            padding-right: 10px;
+        }
+
+        .content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: rgba(30, 58, 138, 0.1);
+            border-radius: 10px;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%);
+            border-radius: 10px;
+        }
+
+        .content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #DC143C 0%, #FFD700 100%);
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-box {
+            background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .feature-box h4 {
+            font-size: 1.35em;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .feature-box p {
+            font-size: 1.05em;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-box {
+            background: #f7fafc;
+            border-left: 4px solid #1E3A8A;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 3em;
+            color: #1E3A8A;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 1em;
+            margin-top: 5px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            font-size: 1.05em;
+        }
+
+        li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #1E3A8A;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .tech-badge {
+            background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 0.95em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .navigation {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%);
+            color: white;
+            border: none;
+            padding: 20px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 2em;
+            transition: all 0.3s;
+            min-width: 60px;
+            font-weight: bold;
+            pointer-events: auto;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.4);
+        }
+
+        #prevBtn {
+            left: 30px;
+        }
+
+        #nextBtn {
+            right: 30px;
+        }
+
+        .nav-button:hover {
+            background: linear-gradient(135deg, #DC143C 0%, #FFD700 100%);
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 16px rgba(220, 20, 60, 0.5);
+        }
+
+        .nav-button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .slide-counter {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #718096;
+            font-size: 1em;
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: white;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 20px;
+        }
+
+        .timeline:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #1E3A8A;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 15px 0;
+        }
+
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -36px;
+            top: 20px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #DC143C;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #1E3A8A;
+        }
+
+        .highlight {
+            background: #fef5e7;
+            padding: 20px;
+            border-left: 4px solid #f39c12;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .api-badges {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .api-badge {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 1.05em;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%);
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        .icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        @keyframes fallEmoji {
+            0%, 100% { transform: translateY(-5px) rotate(-3deg); }
+            50% { transform: translateY(5px) rotate(3deg); }
+        }
+
+        @keyframes spinEmoji {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseEmoji {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.15); opacity: 1; }
+        }
+
+        .stage-box-emoji {
+            display: inline-block;
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .emoji-fall { animation: fallEmoji 2s ease-in-out infinite; }
+        .emoji-spin { animation: spinEmoji 3s linear infinite; }
+        .emoji-pulse { animation: pulseEmoji 2s ease-in-out infinite; }
+
+        .narrative-panel {
+            position: fixed;
+            right: 190px;
+            top: -100%;
+            width: 380px;
+            max-height: 90vh;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            transition: top 0.4s ease-in-out;
+            z-index: 1500;
+            overflow: hidden;
+            padding-top: 50px;
+        }
+
+        .narrative-panel.open {
+            top: 0;
+        }
+
+        .narrative-toggle {
+            position: fixed;
+            right: 190px;
+            top: 0;
+            background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 0 0 10px 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            box-shadow: -3px 3px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            z-index: 1700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .narrative-toggle:hover {
+            background: linear-gradient(135deg, #DC143C 0%, #FFD700 100%);
+            transform: translateY(2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        #playIcon {
+            font-size: 1.1em;
+            padding: 2px 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        #playIcon:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .narrative-content {
+            padding: 12px;
+            color: #1E3A8A;
+            font-size: 1.1em;
+            line-height: 1.5;
+            max-height: calc(90vh - 60px);
+            overflow-y: auto;
+            font-weight: 700;
+            text-align: justify;
+        }
+
+        .narrative-content strong {
+            display: block;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            color: #DC143C;
+            font-style: normal;
+            font-weight: 800;
+            text-align: left;
+        }
+
+        .narrative-text {
+            font-style: normal;
+            color: #1E3A8A;
+            font-weight: 700;
+            text-align: justify;
+        }
+
+        .narrative-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .narrative-content::-webkit-scrollbar-track {
+            background: rgba(30, 58, 138, 0.1);
+            border-radius: 10px;
+        }
+
+        .narrative-content::-webkit-scrollbar-thumb {
+            background: rgba(30, 58, 138, 0.4);
+            border-radius: 10px;
+        }
+
+        @media print {
+            .narrative-panel, .narrative-toggle, .navigation {
+                display: none !important;
+            }
+            .slide {
+                page-break-after: always;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .narrative-panel, .narrative-toggle {
+                right: 20px;
+            }
+            .presentation {
+                padding-right: 50px;
+            }
+        }
+
+        /* RedWaves Audio Control Panel */
+        .audio-control-panel {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 280px;
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            padding: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .audio-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .audio-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .audio-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .audio-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .audio-btn:active {
+            transform: translateY(0);
+        }
+
+        .audio-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 0.9em;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .audio-status-bar #audioStatus {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Legend and Visual Elements */
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .dot.ingest {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .dot.process {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        }
+
+        .dot.store {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        .dot.viz {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+        }
+
+        /* Academic Footer */
+        .academic-footer {
+            margin-top: 25px;
+            padding: 10px 30px;
+            background: white;
+            border: 2px solid #1E3A8A;
+            border-radius: 25px;
+            font-size: 0.9em;
+            color: #4a5568;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.15);
+            text-align: center;
+            display: inline-block;
+        }
+
+        .academic-footer strong {
+            color: #1E3A8A;
+            font-weight: 600;
+        }
+
+        /* Methodology Diagram */
+        .method-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(90deg, rgba(30, 58, 138, 0.05) 0%, rgba(220, 20, 60, 0.05) 100%);
+            border-radius: 10px;
+        }
+
+        .method-step {
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            background: white;
+            border-radius: 8px;
+            margin: 0 5px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .method-step:hover {
+            border-color: #1E3A8A;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+        }
+
+        .method-step-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .method-arrow {
+            font-size: 1.5em;
+            color: #DC143C;
+            flex-shrink: 0;
+        }
+
+        /* Content fit adjustments */
+        .content-compact {
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .content-compact h3 {
+            font-size: 1.3em;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+
+        .content-compact p {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide active" style="background: linear-gradient(135deg, #f7fafc 0%, #fff5e6 100%); position: relative; overflow: hidden;">
+            <div class="logo"><img src="../UCC_Logo.png" alt="UCC Logo"></div>
+
+            <div style="position: absolute; width: 400px; height: 400px; border-radius: 50%; background: linear-gradient(135deg, rgba(220, 20, 60, 0.08) 0%, rgba(255, 215, 0, 0.08) 100%); top: -200px; right: -200px;"></div>
+            <div style="position: absolute; width: 300px; height: 300px; border-radius: 50%; background: linear-gradient(135deg, rgba(30, 58, 138, 0.06) 0%, rgba(220, 20, 60, 0.06) 100%); bottom: -150px; left: -150px;"></div>
+
+            <div style="text-align: center; padding-top: 40px; position: relative; z-index: 1;">
+                <div style="background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%); color: white; padding: 25px 60px; border-radius: 15px; margin: 0 auto 40px; max-width: 900px; box-shadow: 0 10px 30px rgba(220, 20, 60, 0.3);">
+                    <p style="font-size: 1.6em; font-weight: bold; margin-bottom: 12px; letter-spacing: 1px;">UNIVERSITY OF CAPE COAST</p>
+                    <p style="font-size: 0.95em; opacity: 0.95; margin: 5px 0;">School of Development Studies</p>
+                    <p style="font-size: 0.95em; opacity: 0.95; margin: 5px 0;">Centre for Data Archiving, Management, Analysis and Advocacy</p>
+                    <p style="font-size: 0.95em; opacity: 0.95; margin: 5px 0;">MSc Social Science Data Management & Analysis</p>
+                </div>
+
+                <div style="margin: 40px auto; max-width: 950px;">
+                    <div style="display: inline-block; background: linear-gradient(135deg, #DC143C 0%, #FFD700 100%); padding: 8px 25px; border-radius: 25px; margin-bottom: 20px;">
+                        <span style="color: white; font-size: 0.9em; font-weight: 600; letter-spacing: 1px;">📊 CAPSTONE PROJECT</span>
+                    </div>
+                    <h1 style="font-size: 2.6em; margin-bottom: 20px; color: #1E3A8A; font-weight: 800; line-height: 1.3;">A Comprehensive Bibliometric Analysis<br>of COVID-19 Research Publications</h1>
+                    <div style="width: 100px; height: 4px; background: linear-gradient(90deg, #DC143C 0%, #FFD700 100%); margin: 20px auto;"></div>
+                    <p class="subtitle" style="font-size: 1.25em; color: #2d3748; font-weight: 500; line-height: 1.5;">Patterns, Quality, and Global Scientific Response<br>(2020-2024)</p>
+                </div>
+
+                <div style="background: white; padding: 25px 40px; border-radius: 15px; margin: 40px auto 0; max-width: 600px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); border-left: 5px solid #DC143C;">
+                    <p style="font-size: 1.2em; color: #1E3A8A; margin-bottom: 8px;"><strong>Edward Solomon Kweku Gyimah</strong></p>
+                    <p style="font-size: 1em; color: #DC143C; font-weight: 600; margin-bottom: 5px;">SE/DAT/24/0007</p>
+                    <p style="font-size: 0.95em; color: #718096;">edward.gyimah002@stu.ucc.edu.gh</p>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; flex-direction: column; align-items: center;">
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <div style="display: inline-block; background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%); color: white; padding: 10px 30px; border-radius: 25px; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);">
+                            <span style="font-size: 1.05em; font-weight: 600;">📅 October 21, 2025</span>
+                        </div>
+                        <div style="display: inline-block; background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%); color: white; padding: 10px 30px; border-radius: 25px; box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);">
+                            <span style="font-size: 1.05em; font-weight: 600;">⏰ 9:00 AM - 1:00 PM</span>
+                        </div>
+                        <div style="display: inline-block; background: linear-gradient(135deg, #DC143C 0%, #FFD700 100%); color: white; padding: 10px 30px; border-radius: 25px; box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);">
+                            <span style="font-size: 1.05em; font-weight: 600;">⏱️ 20 Min + Q&A</span>
+                        </div>
+                    </div>
+
+                    <div class="academic-footer">
+                        <strong>Supervisor:</strong> Dr William Cantah | Centre for Data Archiving, Management, Analysis and Advocacy
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Overview with Chart -->
+        <div class="slide">
+            <div class="logo"><img src="../UCC_Logo.png" alt="UCC Logo"></div>
+            <div class="slide-header">
+                <h2>📊 Study Overview</h2>
+            </div>
+            <div class="content">
+                <div class="two-column">
+                    <div>
+                        <h3>Research Context</h3>
+                        <p>The COVID-19 pandemic triggered an unprecedented surge in scientific research. This study examines 472 peer-reviewed publications (2020-2024) to understand publication patterns, research quality, and the global scientific response.</p>
+
+                        <h3 style="margin-top: 30px;">Research Objectives</h3>
+                        <ul style="font-size: 0.95em; line-height: 1.5;">
+                            <li style="padding: 6px 0 6px 25px;">Characterize temporal evolution of COVID-19 research</li>
+                            <li style="padding: 6px 0 6px 25px;">Assess research quality systematically</li>
+                            <li style="padding: 6px 0 6px 25px;">Analyze journal distribution patterns</li>
+                            <li style="padding: 6px 0 6px 25px;">Identify temporal trends in quality</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="overviewChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-box">
+                        <div class="stat-number">472</div>
+                        <div class="stat-label">Total Publications Analyzed</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">281</div>
+                        <div class="stat-label">Unique Journals</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">97.52</div>
+                        <div class="stat-label">Mean Quality Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Research Questions -->
+        <div class="slide">
+            <div class="logo"><img src="../UCC_Logo.png" alt="UCC Logo"></div>
+            <div class="slide-header">
+                <h2>❓ Research Questions</h2>
+            </div>
+            <div class="content">
+                <h3 style="margin-bottom: 25px;">Core Questions Guiding This Research</h3>
+
+                <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(30, 58, 138, 0.05) 100%); padding: 25px; margin: 20px 0; border-radius: 10px; border-left: 5px solid #1E3A8A;">
+                    <h3 style="color: #1E3A8A; margin-top: 0;">1. How did publication volumes fluctuate across different pandemic phases?</h3>
+                    <p style="margin-top: 10px; font-size: 0.95em;">Examining temporal patterns from 2020's acute crisis phase through 2024's transition to endemic status.</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(220, 20, 60, 0.1) 0%, rgba(220, 20, 60, 0.05) 100%); padding: 25px; margin: 20px 0; border-radius: 10px; border-left: 5px solid #DC143C;">
+                    <h3 style="color: #DC143C; margin-top: 0;">2. Did research quality remain consistent throughout the pandemic?</h3>
+                    <p style="margin-top: 10px; font-size: 0.95em;">Systematic quality assessment using a 100-point multidimensional scoring system evaluating methodological rigor, reproducibility, and scientific contribution.</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(46, 125, 50, 0.1) 0%, rgba(46, 125, 50, 0.05) 100%); padding: 25px; margin: 20px 0; border-radius: 10px; border-left: 5px solid #2e7d32;">
+                    <h3 style="color: #2e7d32; margin-top: 0;">3. Which journals and disciplines led COVID-19 research production?</h3>
+                    <p style="margin-top: 10px; font-size: 0.95em;">Distribution across 281 unique journals reveals disciplinary engagement patterns and knowledge dissemination pathways.</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%); padding: 25px; margin: 20px 0; border-radius: 10px; border-left: 5px solid #FFD700;">
+                    <h3 style="color: #f57f17; margin-top: 0;">4. What implications do these patterns have for future health emergencies?</h3>
+                    <p style="margin-top: 10px; font-size: 0.95em;">Insights for research policy, funding allocation, and crisis-driven knowledge production frameworks.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Methodology -->
+        <div class="slide">
+            <div class="logo"><img src="../UCC_Logo.png" alt="UCC Logo"></div>
+            <div class="slide-header">
+                <h2>🔬 Methodology</h2>
+            </div>
+            <div class="content content-compact">
+                <h3 style="margin-top: 0; margin-bottom: 15px;">Research Workflow</h3>
+                <div class="method-flow">
+                    <div class="method-step">
+                        <div class="method-step-icon">📥</div>
+                        <div style="font-weight: 600; font-size: 0.9em;">Data Collection</div>
+                    </div>
+                    <div class="method-arrow">→</div>
+                    <div class="method-step">
+                        <div class="method-step-icon">🔍</div>
+                        <div style="font-weight: 600; font-size: 0.9em;">Quality Assessment</div>
+                    </div>
+                    <div class="method-arrow">→</div>
+                    <div class="method-step">
+                        <div class="method-step-icon">📊</div>
+                        <div style="font-weight: 600; font-size: 0.9em;">Statistical Analysis</div>
+                    </div>
+                    <div class="method-arrow">→</div>
+                    <div class="method-step">
+                        <div class="method-step-icon">📈</div>
+                        <div style="font-weight: 600; font-size: 0.9em;">Visualization</div>
+                    </div>
+                </div>
+
+                <div class="two-column" style="gap: 25px;">
+                    <div>
+                        <h3>Quality Assessment Framework</h3>
+                        <p style="margin-bottom: 10px; font-size: 1.05em;">Multidimensional 100-point scoring system:</p>
+                        
+                        <table style="font-size: 0.95em;">
+                            <thead>
+                                <tr>
+                                    <th>Dimension</th>
+                                    <th>Weight</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Methodological Rigor</strong></td>
+                                    <td>30%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reproducibility</strong></td>
+                                    <td>20%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Scientific Contribution</strong></td>
+                                    <td>25%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reporting Quality</strong></td>
+                                    <td>15%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Journal Standing</strong></td>
+                                    <td>10%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <h3>Dataset Characteristics</h3>
+                        <div style="background: #f7fafc; padding: 12px 15px; border-radius: 8px; margin-bottom: 10px;">
+                            <p style="margin: 5px 0; font-size: 1.0em;"><strong>📚 Total Publications:</strong> 472</p>
+                            <p style="margin: 5px 0; font-size: 1.0em;"><strong>📅 COVID-era:</strong> 450 (95.3%)</p>
+                            <p style="margin: 5px 0; font-size: 1.0em;"><strong>🔖 PubMed IDs:</strong> 429 (90.9%)</p>
+                            <p style="margin: 5px 0; font-size: 1.0em;"><strong>🔗 DOIs:</strong> 157 (33.3%)</p>
+                        </div>
+                        <div style="background: #f7fafc; padding: 12px 15px; border-radius: 8px;">
+                            <p style="margin: 5px 0; font-size: 1.0em;"><strong>📝 With Abstracts:</strong> 322 (68.2%)</p>
+                            <p style="margin: 5px 0; font-size: 1.0em;"><strong>📰 Unique Journals:</strong> 281</p>
+                            <p style="margin: 5px 0; font-size: 1.0em;"><strong>👥 Author Groups:</strong> 351</p>
+                            <p style="margin: 5px 0; font-size: 1.0em;"><strong>📊 Quality Range:</strong> 94.75-100</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #fef5e7; padding: 12px 15px; border-left: 4px solid #f39c12; border-radius: 5px; margin-top: 15px;">
+                    <h3 style="margin-top: 0; font-size: 1.3em; margin-bottom: 8px;">Quality Score Interpretation</h3>
+                    <p style="font-size: 0.95em; line-height: 1.5;">
+                        <strong>Exceptional (99-100)</strong> • <strong>Excellent (97-99)</strong> • <strong>Very Good (95-97)</strong> • <strong>Good (94.75-95)</strong>
+                    </p>
+                </div>
+
+                <div class="legend-grid" style="margin-top: 15px; padding: 12px;">
+                    <div class="legend-item">
+                        <span class="dot ingest"></span>
+                        <span>Data Ingestion</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="dot process"></span>
+                        <span>Processing</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="dot store"></span>
+                        <span>Storage</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="dot viz"></span>
+                        <span>Visualization</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Quality Results -->
+        <div class="slide">
+            <div class="logo"><img src="../UCC_Logo.png" alt="UCC Logo"></div>
+            <div class="slide-header">
+                <h2>✅ Quality Assessment Results</h2>
+            </div>
+            <div class="content">
+                <div class="two-column">
+                    <div>
+                        <h3>Overall Quality Distribution</h3>
+                        <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(30, 58, 138, 0.05) 100%); padding: 25px; margin: 20px 0; border-radius: 10px; border-left: 5px solid #1E3A8A;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 4em; color: #1E3A8A; font-weight: bold; margin-bottom: 10px;">97.52</div>
+                                <p style="font-size: 1.4em; color: #DC143C; font-weight: 600;">Mean Quality Score</p>
+                                <p style="font-size: 0.95em; color: #718096; margin-top: 8px;">SD = 1.32 • Range: 94.75-100.0</p>
+                            </div>
+                        </div>
+
+                        <div style="background: linear-gradient(135deg, rgba(46, 125, 50, 0.1) 0%, rgba(46, 125, 50, 0.05) 100%); padding: 20px; margin: 15px 0; border-radius: 8px;">
+                            <h4 style="color: #2e7d32; margin: 0 0 10px 0;">📊 Key Findings</h4>
+                            <p style="margin: 8px 0; font-size: 1em;">✓ <strong>71.6%</strong> achieved excellent/exceptional ratings</p>
+                            <p style="margin: 8px 0; font-size: 1em;">✓ <strong>0%</strong> scored below 94.75</p>
+                            <p style="margin: 8px 0; font-size: 1em;">✓ Maintained standards despite publication pressure</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3>Quality Category Breakdown</h3>
+                        <table style="margin-top: 15px; font-size: 0.95em;">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Range</th>
+                                    <th>Count</th>
+                                    <th>%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #e8f5e9;">
+                                    <td><strong>Exceptional</strong></td>
+                                    <td>99-100</td>
+                                    <td>47</td>
+                                    <td>10.0%</td>
+                                </tr>
+                                <tr style="background: #e3f2fd;">
+                                    <td><strong>Excellent</strong></td>
+                                    <td>97-99</td>
+                                    <td>291</td>
+                                    <td>61.7%</td>
+                                </tr>
+                                <tr style="background: #fff3e0;">
+                                    <td><strong>Very Good</strong></td>
+                                    <td>95-97</td>
+                                    <td>124</td>
+                                    <td>26.3%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Good</strong></td>
+                                    <td>94.75-95</td>
+                                    <td>10</td>
+                                    <td>2.1%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="chart-container" style="height: 200px; margin-top: 20px;">
+                            <canvas id="qualityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Temporal Trends -->
+        <div class="slide">
+            <div class="logo"><img src="../UCC_Logo.png" alt="UCC Logo"></div>
+            <div class="slide-header">
+                <h2>📈 Temporal Trends (2020-2024)</h2>
+            </div>
+            <div class="content">
+                <div class="two-column">
+                    <div>
+                        <h3>Publication Volume by Year</h3>
+                        <table style="margin-top: 15px; font-size: 0.9em;">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Papers</th>
+                                    <th>% Total</th>
+                                    <th>Mean Quality</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #fff9c4;">
+                                    <td><strong>2020</strong></td>
+                                    <td>163</td>
+                                    <td>36.2%</td>
+                                    <td>97.02</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2021</strong></td>
+                                    <td>100</td>
+                                    <td>22.2%</td>
+                                    <td>97.52</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2022</strong></td>
+                                    <td>90</td>
+                                    <td>20.0%</td>
+                                    <td>97.50</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2023</strong></td>
+                                    <td>69</td>
+                                    <td>15.3%</td>
+                                    <td>98.18</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2024</strong></td>
+                                    <td>28</td>
+                                    <td>6.2%</td>
+                                    <td>98.79</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="background: linear-gradient(135deg, rgba(220, 20, 60, 0.1) 0%, rgba(220, 20, 60, 0.05) 100%); padding: 15px; margin-top: 20px; border-radius: 8px;">
+                            <h4 style="color: #DC143C; margin: 0 0 8px 0;">🔍 Key Observations</h4>
+                            <p style="font-size: 0.9em; margin: 5px 0;">• 2020 peak: 36% of all publications</p>
+                            <p style="font-size: 0.9em; margin: 5px 0;">• Progressive decline through 2024</p>
+                            <p style="font-size: 0.9em; margin: 5px 0;">• Quality improved inversely to volume</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3>Temporal Patterns</h3>
+                        <div class="chart-container" style="height: 280px;">
+                            <canvas id="publicationsChart"></canvas>
+                        </div>
+
+                        <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%); padding: 15px; margin-top: 15px; border-radius: 8px;">
+                            <h4 style="color: #f57f17; margin: 0 0 8px 0;">💡 Interpretation</h4>
+                            <p style="font-size: 0.9em; line-height: 1.5;">The inverse relationship between volume and quality suggests successful navigation of speed-rigor tradeoffs. Even 2020's "lower" quality (97.02) remained in the excellent range.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Journal Distribution -->
+        <div class="slide">
+            <div class="logo"><img src="../UCC_Logo.png" alt="UCC Logo"></div>
+            <div class="slide-header">
+                <h2>📰 Journal Distribution & Publication Venues</h2>
+            </div>
+            <div class="content">
+                <h3 style="margin-bottom: 15px;">Top 15 Publication Venues</h3>
+                
+                <div class="two-column" style="gap: 20px;">
+                    <div>
+                        <table style="font-size: 0.85em;">
+                            <thead>
+                                <tr>
+                                    <th>Journal</th>
+                                    <th>Papers</th>
+                                    <th>%</th>
+                                    <th>Qual.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>arXiv (Preprint)</strong></td>
+                                    <td>40</td>
+                                    <td>8.5%</td>
+                                    <td>95.90</td>
+                                </tr>
+                                <tr style="background: #e8f5e9;">
+                                    <td><strong>NEJM</strong></td>
+                                    <td>20</td>
+                                    <td>4.2%</td>
+                                    <td>97.75</td>
+                                </tr>
+                                <tr style="background: #e8f5e9;">
+                                    <td><strong>The Lancet</strong></td>
+                                    <td>17</td>
+                                    <td>3.6%</td>
+                                    <td>97.81</td>
+                                </tr>
+                                <tr style="background: #e8f5e9;">
+                                    <td><strong>Nature</strong></td>
+                                    <td>13</td>
+                                    <td>2.8%</td>
+                                    <td>97.98</td>
+                                </tr>
+                                <tr>
+                                    <td>J. Laryngology & Otology</td>
+                                    <td>9</td>
+                                    <td>1.9%</td>
+                                    <td>97.36</td>
+                                </tr>
+                                <tr>
+                                    <td>Nucleic Acids Research</td>
+                                    <td>8</td>
+                                    <td>1.7%</td>
+                                    <td>96.19</td>
+                                </tr>
+                                <tr style="background: #e8f5e9;">
+                                    <td><strong>JAMA</strong></td>
+                                    <td>8</td>
+                                    <td>1.7%</td>
+                                    <td>97.75</td>
+                                </tr>
+                                <tr>
+                                    <td>Cureus</td>
+                                    <td>8</td>
+                                    <td>1.7%</td>
+                                    <td>98.19</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(30, 58, 138, 0.05) 100%); padding: 20px; margin: 10px 0; border-radius: 8px; border-left: 5px solid #1E3A8A;">
+                            <h4 style="color: #1E3A8A; margin: 0 0 10px 0;">📊 Distribution Overview</h4>
+                            <p style="font-size: 0.95em; margin: 8px 0;"><strong>281 unique journals</strong> = Remarkable disciplinary diversity</p>
+                            <p style="font-size: 0.95em; margin: 8px 0;"><strong>Top 15 venues:</strong> 159 papers (33.7%)</p>
+                            <p style="font-size: 0.95em; margin: 8px 0;"><strong>Elite medical journals:</strong> 45 papers (9.5%)</p>
+                        </div>
+
+                        <div style="background: linear-gradient(135deg, rgba(46, 125, 50, 0.1) 0%, rgba(46, 125, 50, 0.05) 100%); padding: 20px; margin: 10px 0; border-radius: 8px; border-left: 5px solid #2e7d32;">
+                            <h4 style="color: #2e7d32; margin: 0 0 10px 0;">🔍 Key Findings</h4>
+                            <p style="font-size: 0.9em; margin: 6px 0;">• <strong>Preprints (9.1%)</strong> enabled rapid dissemination</p>
+                            <p style="font-size: 0.9em; margin: 6px 0;">• <strong>Quality scores:</strong> Preprints 95.90 vs Journals 97.68</p>
+                            <p style="font-size: 0.9em; margin: 6px 0;">• <strong>Open-access journals</strong> (e.g., Cureus) performed exceptionally</p>
+                            <p style="font-size: 0.9em; margin: 6px 0;">• <strong>Disciplinary breadth:</strong> Beyond infectious disease to economics, psychology, education</p>
+                        </div>
+
+                        <div class="chart-container" style="height: 150px; margin-top: 15px;">
+                            <canvas id="journalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Key Findings -->
+        <div class="slide">
+            <div class="logo"><img src="../UCC_Logo.png" alt="UCC Logo"></div>
+            <div class="slide-header" style="padding-bottom: 10px; margin-bottom: 15px;">
+                <h2 style="margin-bottom: 10px;">🎯 Principal Findings</h2>
+            </div>
+            <div class="content content-compact">
+                <div class="two-column" style="gap: 20px;">
+                    <div>
+                        <div class="feature-box" style="margin-bottom: 12px; padding: 15px;">
+                            <div class="icon" style="margin-bottom: 5px; font-size: 3em;">✅</div>
+                            <h4 style="font-size: 1.3em; margin-bottom: 6px;">Sustained Quality</h4>
+                            <p style="font-size: 1.05em;">Mean 97.52/100 across 281 journals</p>
+                        </div>
+                        <div class="feature-box" style="padding: 15px;">
+                            <div class="icon" style="margin-bottom: 5px; font-size: 3em;">📈</div>
+                            <h4 style="font-size: 1.3em; margin-bottom: 6px;">Temporal Patterns</h4>
+                            <p style="font-size: 1.05em;">2020 peak (36%) → 2024 (6%)</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="feature-box" style="margin-bottom: 12px; padding: 15px;">
+                            <div class="icon" style="margin-bottom: 5px; font-size: 3em;">🌐</div>
+                            <h4 style="font-size: 1.3em; margin-bottom: 6px;">Disciplinary Diversity</h4>
+                            <p style="font-size: 1.05em;">281 journals, broad engagement</p>
+                        </div>
+                        <div class="feature-box" style="padding: 15px;">
+                            <div class="icon" style="margin-bottom: 5px; font-size: 3em;">🚀</div>
+                            <h4 style="font-size: 1.3em; margin-bottom: 6px;">Open Science Evolution</h4>
+                            <p style="font-size: 1.05em;">Preprints (9%), OA models</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin: 15px 0 10px 0; font-size: 1.7em;">Critical Insights</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(30, 58, 138, 0.05) 100%); padding: 14px; border-radius: 8px; border-left: 5px solid #1E3A8A;">
+                        <h4 style="color: #1E3A8A; margin: 0 0 6px 0; font-size: 1.3em;">🎓 Maintained Standards</h4>
+                        <p style="font-size: 1.0em; line-height: 1.45;">Community balanced urgency with rigor. Even 2020 quality (97.02) remained excellent.</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(220, 20, 60, 0.1) 0%, rgba(220, 20, 60, 0.05) 100%); padding: 14px; border-radius: 8px; border-left: 5px solid #DC143C;">
+                        <h4 style="color: #DC143C; margin: 0 0 6px 0; font-size: 1.3em;">📊 Quality Improvement</h4>
+                        <p style="font-size: 1.0em; line-height: 1.45;">Quality rose as volume fell (2024: 98.79), showing sophisticated work.</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(46, 125, 50, 0.1) 0%, rgba(46, 125, 50, 0.05) 100%); padding: 14px; border-radius: 8px; border-left: 5px solid #2e7d32;">
+                        <h4 style="color: #2e7d32; margin: 0 0 6px 0; font-size: 1.3em;">🌍 Knowledge Fragmentation</h4>
+                        <p style="font-size: 1.0em; line-height: 1.45;">281 journals show diversity, but only 34% in top 15 creates challenges.</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%); padding: 14px; border-radius: 8px; border-left: 5px solid #FFD700;">
+                        <h4 style="color: #f57f17; margin: 0 0 6px 0; font-size: 1.3em;">📖 Preprints Validated</h4>
+                        <p style="font-size: 1.0em; line-height: 1.45;">Preprints maintained quality (95.90) while enabling rapid sharing.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Discussion Highlights -->
+        <div class="slide">
+            <div class="logo"><img src="../UCC_Logo.png" alt="UCC Logo"></div>
+            <div class="slide-header">
+                <h2>💡 Discussion & Implications</h2>
+            </div>
+            <div class="content">
+                <h3>Theoretical Contributions</h3>
+                <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(30, 58, 138, 0.05) 100%); padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 5px solid #1E3A8A;">
+                    <p style="font-size: 1em; line-height: 1.6;"><strong>Crisis Science Framework:</strong> Empirical evidence that scientific institutions can adapt to emergency conditions while preserving quality standards, given sufficient resources. Speed doesn't necessarily compromise rigor—relationship is contingent on institutional capacity.</p>
+                </div>
+
+                <h3 style="margin-top: 25px;">Practical Recommendations</h3>
+                <table style="font-size: 0.9em; margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th>Area</th>
+                            <th>Recommendation</th>
+                            <th>Rationale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Rapid Research</strong></td>
+                            <td>Codify fast-track mechanisms</td>
+                            <td>Quality maintained despite accelerated timelines</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sustained Investigation</strong></td>
+                            <td>Support long-term studies</td>
+                            <td>Steep post-2020 decline suggests need for momentum</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Knowledge Synthesis</strong></td>
+                            <td>Enhance evidence aggregation</td>
+                            <td>Fragmentation across 281 journals requires integration</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Open Access</strong></td>
+                            <td>Accelerate open science</td>
+                            <td>Preprints/OA performed well; pandemic knowledge should be accessible</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight" style="margin-top: 20px;">
+                    <h3>Study Limitations</h3>
+                    <p style="font-size: 0.95em; line-height: 1.5;">
+                        • 472 publications = small fraction of 200,000+ total COVID-19 papers •
+                        Curated sample may not generalize to full corpus •
+                        Quality framework reflects specific criteria •
+                        Published literature excludes unpublished negative results •
+                        Cannot fully capture methodological details from published text alone
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Conclusions -->
+        <div class="slide">
+            <div class="logo"><img src="../UCC_Logo.png" alt="UCC Logo"></div>
+            <div class="slide-header">
+                <h2>🎯 Conclusions</h2>
+            </div>
+            <div class="content content-compact">
+                <h3 style="margin-bottom: 15px;">Summary of Key Findings</h3>
+                <div class="feature-grid" style="grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;">
+                    <div class="feature-box">
+                        <div class="icon">✅</div>
+                        <h4>Quality</h4>
+                        <p>97.52 mean maintained across crisis</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="icon">📊</div>
+                        <h4>Volume</h4>
+                        <p>2020 peak, progressive decline</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="icon">🌐</div>
+                        <h4>Diversity</h4>
+                        <p>281 journals, broad engagement</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="icon">🚀</div>
+                        <h4>Evolution</h4>
+                        <p>Preprints, open science gains</p>
+                    </div>
+                </div>
+
+                <div class="two-column" style="gap: 30px; align-items: center;">
+                    <div class="highlight" style="padding: 20px;">
+                        <h3 style="font-size: 1.4em; margin-bottom: 12px;">Primary Contributions</h3>
+                        <ul style="font-size: 0.95em; line-height: 1.6; list-style: none; padding-left: 0;">
+                            <li style="padding: 6px 0 6px 35px; position: relative;"><span style="position: absolute; left: 0; color: #1E3A8A; font-weight: bold; font-size: 1.3em;">✓</span><strong>Empirical evidence:</strong> Scientific institutions successfully adapted to crisis conditions</li>
+                            <li style="padding: 6px 0 6px 35px; position: relative;"><span style="position: absolute; left: 0; color: #1E3A8A; font-weight: bold; font-size: 1.3em;">✓</span><strong>Temporal insights:</strong> Complete trajectory from emergency to endemic phases</li>
+                            <li style="padding: 6px 0 6px 35px; position: relative;"><span style="position: absolute; left: 0; color: #1E3A8A; font-weight: bold; font-size: 1.3em;">✓</span><strong>Quality framework:</strong> Multidimensional assessment beyond citation metrics</li>
+                            <li style="padding: 6px 0 6px 35px; position: relative;"><span style="position: absolute; left: 0; color: #1E3A8A; font-weight: bold; font-size: 1.3em;">✓</span><strong>Policy implications:</strong> Evidence-based recommendations for future preparedness</li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; padding: 40px 35px; background: linear-gradient(135deg, #1E3A8A 0%, #DC143C 100%); color: white; border-radius: 15px; box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);">
+                        <h2 style="color: white; font-size: 2.3em; margin-bottom: 15px;">Thank You</h2>
+                        <p style="font-size: 1.2em; margin-top: 12px; color: white; font-weight: 600;">Questions & Discussion</p>
+                        <div style="margin-top: 25px; padding-top: 15px; border-top: 2px solid rgba(255, 255, 255, 0.3);">
+                            <p style="font-size: 0.95em; color: #FFD700; font-weight: 600;">edward.gyimah002@stu.ucc.edu.gh</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">←</button>
+            <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">→</button>
+            <div class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">10</span></div>
+        </div>
+    </div>
+
+    <!-- Narrative Side Panel -->
+    <div class="narrative-panel" id="narrativePanel">
+        <div class="narrative-content" id="narrativeContent">
+            <strong>Speaking Notes</strong>
+            <div class="narrative-text">Click on a slide to see speaking guidance.</div>
+        </div>
+    </div>
+
+    <!-- Narrative Toggle Button -->
+    <button class="narrative-toggle" id="narrativeToggle" onclick="toggleNarrative()">
+        <span>📖</span>
+        <span id="narrativeLabel">Speaking Notes</span>
+    </button>
+
+    <!-- RedWaves Audio Control Panel -->
+    <div id="audioControlPanel" class="audio-control-panel">
+        <div class="audio-panel-header">
+            <span style="font-weight: bold;">🎙️ RedWaves Audio</span>
+            <button onclick="document.getElementById('audioControlPanel').style.display='none'" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.2em;">×</button>
+        </div>
+        <div class="audio-controls">
+            <button id="playPauseBtn" onclick="toggleSpeech()" class="audio-btn">▶️ Play</button>
+            <button id="replayBtn" onclick="replayAudio()" class="audio-btn">🔁 Replay</button>
+            <button id="autoPlayBtn" onclick="toggleAutoPlay()" class="audio-btn">▶️ Auto</button>
+        </div>
+        <div class="audio-status-bar">
+            <span id="audioStatus" style="color: #666;">Ready</span>
+            <span id="audioSource" style="font-size: 0.8em; opacity: 0.7;">Cloned Voice</span>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        // Narrative texts for each slide
+        const narratives = {
+            0: {
+                duration: "30 seconds",
+                text: "Good afternoon, esteemed panel members and guests. Thank you for the opportunity to present my capstone project. Today, I present a comprehensive bibliometric analysis of COVID-19 research publications examining patterns, quality, and the global scientific response from 2020 through 2024. This study analyzes 472 peer-reviewed publications to understand how the scientific community responded to an unprecedented health emergency."
+            },
+            1: {
+                duration: "45 seconds",
+                text: "This study examines 472 peer-reviewed publications spanning 2020 to 2024, covering the pandemic's acute phase through the transition to endemic status. The corpus is distributed across 281 unique journals, demonstrating remarkable disciplinary diversity. Our research pursued four primary objectives: characterizing temporal evolution of COVID-19 publications, systematically assessing research quality using a multidimensional 100-point scoring system, analyzing publication patterns across journals and disciplines, and identifying temporal trends in methodological sophistication. The mean quality score of 97.52 out of 100 suggests maintained research standards despite unprecedented publication pressure."
+            },
+            2: {
+                duration: "50 seconds",
+                text: "This research addresses four fundamental questions. First, how did publication volumes fluctuate across different pandemic phases? We examine temporal patterns from 2020's acute crisis through 2024's endemic transition. Second, did research quality remain consistent throughout the pandemic? Our systematic quality assessment uses a 100-point multidimensional scoring system evaluating methodological rigor, reproducibility, and scientific contribution. Third, which journals and disciplines led COVID-19 research production? Distribution across 281 unique journals reveals disciplinary engagement patterns. Finally, what implications do these patterns have for future health emergencies? We provide evidence-based insights for research policy, funding allocation, and crisis-driven knowledge production."
+            },
+            3: {
+                duration: "55 seconds",
+                text: "Our methodology employs a comprehensive quality assessment framework with five weighted dimensions. Methodological rigor receives 30% weight, evaluating study design, sample size, statistical analysis, and bias control. Reproducibility carries 20% weight, assessing methods detail, data availability, and protocol transparency. Scientific contribution comprises 25%, examining novelty, clinical relevance, and knowledge advancement. Reporting quality accounts for 15%, evaluating adherence to PRISMA and STROBE standards. Journal standing contributes 10%, assessing reputation and editorial standards. The dataset includes 472 publications with 450 from the COVID-era, 90.9% with PubMed IDs, and 281 unique journals represented. Quality scores range from 94.75 to 100, with interpretation categories from Good through Exceptional."
+            },
+            4: {
+                duration: "50 seconds",
+                text: "The quality assessment results demonstrate exceptional standards maintained throughout the pandemic. The mean quality score of 97.52 with a standard deviation of just 1.32 indicates remarkable consistency. The distribution reveals that 71.6% of publications achieved excellent or exceptional ratings. Specifically, 10% scored as exceptional in the 99 to 100 range, 61.7% as excellent in the 97 to 99 range, 26.3% as very good, and only 2.1% in the good category. Critically, zero publications scored below 94.75, challenging widespread concerns that accelerated publication timelines would fundamentally compromise research standards. This narrow distribution suggests either successful quality curation or genuine maintenance of research rigor during the crisis."
+            },
+            5: {
+                duration: "55 seconds",
+                text: "Temporal analysis reveals distinct patterns corresponding to pandemic phases. The year 2020 saw dramatic peak activity with 163 publications representing 36.2% of the corpus, coinciding with the acute crisis phase when knowledge needs were most urgent. This was followed by progressive decline: 100 papers in 2021, 90 in 2022, 69 in 2023, and 28 in 2024. Remarkably, quality scores demonstrated an inverse relationship with volume, improving from 97.02 in 2020 to 98.79 in 2024. This pattern suggests successful navigation of speed-rigor tradeoffs. While 2020's lower quality reflects urgency-driven compression of timelines, the score still remained firmly in the excellent range, indicating maintained standards despite extraordinary pressure. The improvement over time suggests that as publication pressure decreased and knowledge accumulated, researchers had more time for careful study design."
+            },
+            6: {
+                duration: "60 seconds",
+                text: "The 472 publications distributed across 281 unique journals demonstrate remarkable disciplinary diversity extending far beyond traditional infectious disease outlets to encompass social sciences, economics, psychology, and numerous other domains. The top 15 venues accounted for only 159 publications or 33.7% of the total. Preprint archives, particularly arXiv, contributed 40 publications representing 8.5%, reflecting the pandemic's acceleration of preprint adoption. Elite general medical journals—New England Journal of Medicine, The Lancet, and JAMA—published 45 papers collectively, establishing themselves as primary pandemic knowledge sources. Notably, preprints scored slightly lower at 95.90 compared to 97.68 for peer-reviewed publications, though this difference represents movement within the very good to excellent range. Open-access journals like Cureus performed exceptionally well with a mean quality of 98.19, challenging assumptions about exclusive quality advantages of traditional subscription journals."
+            },
+            7: {
+                duration: "50 seconds",
+                text: "Four principal findings emerge from this analysis. First, sustained quality under pressure: the mean of 97.52 with remarkable consistency across 281 journals and five years challenges concerns about compromised standards. Second, distinct temporal patterns: the 2020 peak at 36% followed by progressive decline to 6% in 2024, with quality improving inversely. Third, remarkable disciplinary diversity: 281 unique journals spanning medicine, social sciences, and economics, though this creates knowledge synthesis challenges with only 34% in top venues. Fourth, evolution of scholarly communication: substantial preprint adoption at 9% and robust open-access performance suggest pandemic-driven evolution in knowledge dissemination practices that may permanently shift attitudes toward pre-review publication in health sciences."
+            },
+            8: {
+                duration: "55 seconds",
+                text: "This study makes important theoretical and practical contributions. Theoretically, we provide empirical evidence that scientific institutions can adapt to emergency conditions while preserving quality standards when given sufficient resources. The relationship between speed and rigor is contingent on institutional capacity, not automatically compromising. Practically, we offer four evidence-based recommendations. First, codify rapid research mechanisms including preprint infrastructure and fast-track peer review. Second, support sustained investigation beyond acute phases, as the steep post-2020 decline suggests need for momentum. Third, enhance knowledge synthesis infrastructure, as fragmentation across 281 journals requires robust evidence aggregation. Fourth, accelerate open science transitions, as preprints and open-access models performed well. Study limitations include analysis of only 472 of 200,000+ total papers, specific quality criteria, and exclusion of unpublished work."
+            },
+            9: {
+                duration: "70 seconds",
+                text: "In conclusion, this comprehensive bibliometric analysis of 472 COVID-19 publications provides systematic evidence about scientific responses to health emergencies. Key findings include sustained quality at 97.52 mean maintained across the crisis, temporal patterns with 2020 peak and progressive decline, disciplinary diversity across 281 journals with broad multidisciplinary engagement, and evolution toward preprints and open science models. The study makes four primary contributions: empirical evidence that scientific institutions successfully adapted to crisis conditions, temporal insights capturing the complete trajectory from emergency to endemic phases, a quality framework providing multidimensional assessment beyond simple citation metrics, and policy implications offering evidence-based recommendations for future pandemic preparedness. The COVID-19 research response demonstrates both the remarkable capacity of scientific institutions to adapt and the continuing importance of foundational practices—careful methodology, rigorous peer review, transparent reporting—that ensure quality regardless of circumstances. Thank you for your attention. I'm happy to answer your questions and discuss any aspect of this research."
+            }
+        };
+
+        function toggleNarrative() {
+            const panel = document.getElementById('narrativePanel');
+            const toggle = document.getElementById('narrativeToggle');
+            const isOpen = panel.classList.toggle('open');
+            toggle.classList.toggle('panel-open');
+            updateNarrativeButton(isOpen);
+        }
+
+        function updateNarrativeButton(isOpen) {
+            // Button text only, no play icon
+        }
+
+        // RedWaves XTTS-v2 Audio Synchronizer
+        let currentAudio = null;
+        let isSpeaking = false;
+        let autoPlayEnabled = false;
+
+        function toggleSpeech() {
+            if (isSpeaking) {
+                stopSpeech();
+            } else {
+                startSpeech();
+            }
+        }
+
+        function startSpeech() {
+            // Stop any current audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+
+            // Try cloned voice first, fallback to Google TTS
+            const audioFiles = [
+                `audio_cloned/slide_${currentSlide}.wav`,  // Cloned voice
+                `audio/slide_${currentSlide}.mp3`           // Fallback
+            ];
+
+            let audioIndex = 0;
+
+            function tryLoadAudio() {
+                if (audioIndex >= audioFiles.length) {
+                    console.warn('No audio file found for slide', currentSlide);
+                    stopSpeech();
+                    return;
+                }
+
+                currentAudio = new Audio(audioFiles[audioIndex]);
+
+                currentAudio.onloadeddata = function() {
+                    isSpeaking = true;
+                    updateAudioControls();
+                    currentAudio.play().catch(err => {
+                        console.error('Playback error:', err);
+                        audioIndex++;
+                        tryLoadAudio();
+                    });
+                };
+
+                currentAudio.onended = function() {
+                    stopSpeech();
+                    // Auto-advance to next slide after 3 seconds
+                    if (currentSlide < totalSlides - 1) {
+                        setTimeout(() => changeSlide(1), 3000);
+                    }
+                };
+
+                currentAudio.onerror = function() {
+                    // Try next audio file
+                    audioIndex++;
+                    tryLoadAudio();
+                };
+            }
+
+            tryLoadAudio();
+        }
+
+        function stopSpeech() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            isSpeaking = false;
+            updateAudioControls();
+        }
+
+        function replayAudio() {
+            stopSpeech();
+            startSpeech();
+        }
+
+        function toggleAutoPlay() {
+            autoPlayEnabled = !autoPlayEnabled;
+            const btn = document.getElementById('autoPlayBtn');
+            if (btn) {
+                btn.textContent = autoPlayEnabled ? '⏸️ Auto' : '▶️ Auto';
+                btn.style.background = autoPlayEnabled ? '#2e7d32' : '#666';
+            }
+        }
+
+        function updateAudioControls() {
+            const audioStatus = document.getElementById('audioStatus');
+            const replayBtn = document.getElementById('replayBtn');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+
+            if (playPauseBtn) {
+                playPauseBtn.textContent = isSpeaking ? '⏸️ Pause' : '▶️ Play';
+            }
+
+            if (audioStatus) {
+                audioStatus.textContent = isSpeaking ? 'Playing...' : 'Ready';
+                audioStatus.style.color = isSpeaking ? '#4caf50' : '#fff';
+            }
+
+            if (replayBtn) {
+                replayBtn.disabled = isSpeaking;
+                replayBtn.style.opacity = isSpeaking ? '0.5' : '1';
+            }
+        }
+
+        function updateNarrative(slideIndex) {
+            const narrative = narratives[slideIndex];
+            const contentDiv = document.getElementById('narrativeContent');
+
+            if (narrative) {
+                contentDiv.innerHTML = `
+                    <strong>Narrative (${narrative.duration}):</strong>
+                    <div class="narrative-text">${narrative.text}</div>
+                `;
+            } else {
+                contentDiv.innerHTML = `
+                    <strong>Speaking Notes</strong>
+                    <div class="narrative-text">No speaking notes for this slide.</div>
+                `;
+            }
+        }
+
+        const chartColors = {
+            primary: '#1E3A8A',
+            secondary: '#DC143C',
+            gold: '#FFD700',
+            success: '#48bb78',
+            warning: '#f39c12',
+            info: '#3498db'
+        };
+
+        function createOverviewChart() {
+            const ctx = document.getElementById('overviewChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Publications', 'Unique Journals', 'Quality Score (×10)'],
+                    datasets: [{
+                        data: [472, 281, 975],
+                        backgroundColor: [chartColors.primary, chartColors.success, chartColors.gold],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 14 },
+                                padding: 15
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Study Overview Metrics',
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createQualityChart() {
+            const ctx = document.getElementById('qualityChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Exceptional', 'Excellent', 'Very Good', 'Good'],
+                    datasets: [{
+                        label: 'Publications',
+                        data: [47, 291, 124, 10],
+                        backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#9e9e9e'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Quality Distribution',
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createPublicationsChart() {
+            const ctx = document.getElementById('publicationsChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024'],
+                    datasets: [{
+                        label: 'Publications',
+                        data: [163, 100, 90, 69, 28],
+                        borderColor: '#DC143C',
+                        backgroundColor: 'rgba(220, 20, 60, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#DC143C',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Publication Count',
+                                font: { size: 12, weight: 'bold' }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year',
+                                font: { size: 12, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createJournalChart() {
+            const ctx = document.getElementById('journalChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Top 15 Journals', 'Other 266 Journals'],
+                    datasets: [{
+                        data: [159, 313],
+                        backgroundColor: [chartColors.primary, chartColors.info],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: { size: 11 } }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Journal Concentration',
+                            font: { size: 12, weight: 'bold' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function showSlide(n) {
+            if (speechSynthesis.speaking) {
+                stopSpeech();
+            }
+
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide].classList.add('active');
+
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+
+            updateNarrative(currentSlide);
+
+            setTimeout(() => {
+                if (currentSlide === 1) createOverviewChart();
+                if (currentSlide === 4) createQualityChart();
+                if (currentSlide === 5) createPublicationsChart();
+                if (currentSlide === 6) createJournalChart();
+            }, 100);
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'Home') showSlide(0);
+            if (e.key === 'End') showSlide(totalSlides - 1);
+        });
+
+        showSlide(0);
+        updateNarrative(0);
+    </script>
+</body>
+</html>
+                
