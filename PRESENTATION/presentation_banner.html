@@ -80,9 +80,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: #006633;
-            font-size: 24px;
+            overflow: hidden;
+            padding: 8px;
+        }
+
+        .logo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .university-info {
@@ -204,7 +209,9 @@
         <!-- Header Section -->
         <div class="header">
             <div class="logo-section">
-                <div class="logo-placeholder">UCC</div>
+                <div class="logo-placeholder">
+                    <img src="UCC_Logo.png" alt="University of Cape Coast Logo">
+                </div>
                 <div class="university-info">
                     <h3>UNIVERSITY OF CAPE COAST</h3>
                     <p>School of Economics</p>
@@ -247,12 +254,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Instructions for creating PNG -->
-    <div style="margin-top: 30px; max-width: 1200px; text-align: center; color: #666; font-size: 14px;">
-        <p><strong>To create PNG:</strong> Press F12 → Take screenshot of banner element OR use browser screenshot tool</p>
-        <p>Windows: Shift + Win + S | Mac: Cmd + Shift + 4</p>
     </div>
 </body>
 </html>

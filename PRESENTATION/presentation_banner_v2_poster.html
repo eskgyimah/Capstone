@@ -88,10 +88,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: #006633;
-            font-size: 36px;
+            overflow: hidden;
+            padding: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .university-info h1 {
@@ -256,7 +261,9 @@
         <!-- Header -->
         <div class="header">
             <div class="logo-section">
-                <div class="logo-placeholder">UCC</div>
+                <div class="logo-placeholder">
+                    <img src="UCC_Logo.png" alt="University of Cape Coast Logo">
+                </div>
                 <div class="university-info">
                     <h1>UNIVERSITY OF CAPE COAST</h1>
                     <p>College of Humanities and Legal Studies</p>
@@ -319,15 +326,6 @@
                 October 2025 • University of Cape Coast
             </div>
         </div>
-    </div>
-
-    <!-- Scale Note -->
-    <div class="scale-note" style="margin-top: 30px; max-width: 960px; text-align: center; color: #666; font-size: 14px; padding: 20px; background: white; border-radius: 10px;">
-        <h3 style="color: #006633; margin-bottom: 10px;">📏 POSTER SIZE: 48" × 60" (Portrait)</h3>
-        <p style="margin-bottom: 10px;"><strong>Current view:</strong> Scaled down to fit screen (1/5 scale)</p>
-        <p style="margin-bottom: 10px;"><strong>Actual print size:</strong> 48 inches wide × 60 inches tall</p>
-        <p style="margin-bottom: 15px;"><strong>Recommended print resolution:</strong> 150-300 DPI</p>
-        <p style="font-size: 12px; color: #999;"><strong>To create high-res PNG:</strong> Use Chrome print to PDF at 48×60", then convert to PNG at 300 DPI</p>
     </div>
 </body>
 </html>
