@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone Poster Banner 48x60 - Edward Gyimah</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Poster: 48" x 60" at 96 DPI = 4608 x 5760 pixels (scaled to fit screen) */
+        .poster-banner {
+            width: 960px;  /* Scaled down for screen (1/5 scale for viewing) */
+            height: 1200px; /* Maintains 48:60 ratio */
+            background: linear-gradient(180deg, #006633 0%, #004d26 50%, #003319 100%);
+            border-radius: 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* For print: Uncomment this and adjust width/height to actual poster size */
+        @media print {
+            body {
+                background: white;
+            }
+            .poster-banner {
+                width: 48in;
+                height: 60in;
+                box-shadow: none;
+            }
+            .scale-note {
+                display: none;
+            }
+        }
+
+        /* Decorative background pattern */
+        .poster-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Header Section */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px 50px;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .logo-placeholder {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #006633;
+            font-size: 36px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .university-info h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .university-info p {
+            color: white;
+            font-size: 16px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .course-badge {
+            background: #DC143C;
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-title {
+            color: white;
+            font-size: 56px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            color: white;
+            font-size: 24px;
+            line-height: 1.6;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        /* Statistics Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 64px;
+            font-weight: 900;
+            color: white;
+            display: block;
+            line-height: 1;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-label {
+            font-size: 18px;
+            color: white;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* Footer Section */
+        .footer {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 40px 50px;
+            border-top: 3px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .author-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .author-name {
+            color: white;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .author-details {
+            color: white;
+            font-size: 18px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .supervisor-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .supervisor-title {
+            color: white;
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .supervisor-name {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .date-stamp {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            margin-top: 25px;
+            opacity: 0.8;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="poster-banner">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo-placeholder">UCC</div>
+                <div class="university-info">
+                    <h1>UNIVERSITY OF CAPE COAST</h1>
+                    <p>College of Humanities and Legal Studies</p>
+                    <p>School of Economics</p>
+                    <p>Department of Data Science and Economic Policy</p>
+                </div>
+            </div>
+            <div class="course-badge">DMA898 CAPSTONE PROJECT</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h1 class="main-title">
+                A Comprehensive Bibliometric Analysis of COVID-19 Research Publications
+            </h1>
+            <p class="subtitle">
+                Examining Patterns, Quality, and Global Scientific Response During the Pandemic Era (2020-2024)
+            </p>
+
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">472</span>
+                    <span class="stat-label">Publications<br>Analyzed</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">281</span>
+                    <span class="stat-label">Unique<br>Journals</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">97.52</span>
+                    <span class="stat-label">Mean Quality<br>Score / 100</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">2020-24</span>
+                    <span class="stat-label">Study<br>Period</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="author-section">
+                <div class="author-name">EDWARD SOLOMON KWEKU GYIMAH</div>
+                <div class="author-details">
+                    Student ID: SE/DAT/24/0007<br>
+                    Master of Philosophy in Data Science
+                </div>
+            </div>
+
+            <div class="supervisor-section">
+                <div class="supervisor-title">Supervisor</div>
+                <div class="supervisor-name">Dr. Raymond E. Kofi Nti</div>
+                <div class="author-details" style="font-size: 16px; margin-top: 5px;">
+                    Senior Lecturer, Department of Data Science and Economic Policy
+                </div>
+            </div>
+
+            <div class="date-stamp">
+                October 2025 • University of Cape Coast
+            </div>
+        </div>
+    </div>
+
+    <!-- Scale Note -->
+    <div class="scale-note" style="margin-top: 30px; max-width: 960px; text-align: center; color: #666; font-size: 14px; padding: 20px; background: white; border-radius: 10px;">
+        <h3 style="color: #006633; margin-bottom: 10px;">📏 POSTER SIZE: 48" × 60" (Portrait)</h3>
+        <p style="margin-bottom: 10px;"><strong>Current view:</strong> Scaled down to fit screen (1/5 scale)</p>
+        <p style="margin-bottom: 10px;"><strong>Actual print size:</strong> 48 inches wide × 60 inches tall</p>
+        <p style="margin-bottom: 15px;"><strong>Recommended print resolution:</strong> 150-300 DPI</p>
+        <p style="font-size: 12px; color: #999;"><strong>To create high-res PNG:</strong> Use Chrome print to PDF at 48×60", then convert to PNG at 300 DPI</p>
+    </div>
+</body>
+</html>
