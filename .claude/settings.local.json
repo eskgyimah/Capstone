@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(start \"C:\\Users\\eskgy\\Desktop\\DMA_CAPSTONE\\EMAIL_TO_SUPERVISOR.html\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

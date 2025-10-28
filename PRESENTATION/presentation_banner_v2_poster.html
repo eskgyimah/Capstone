@@ -18,18 +18,22 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
+            margin: 0;
+            overflow: auto;
         }
 
         /* Poster: 48" x 60" at 96 DPI = 4608 x 5760 pixels (scaled to fit screen) */
         .poster-banner {
-            width: 960px;  /* Scaled down for screen (1/5 scale for viewing) */
-            height: 1200px; /* Maintains 48:60 ratio */
+            width: 100vw;
+            height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
             background: linear-gradient(180deg, #006633 0%, #004d26 50%, #003319 100%);
             border-radius: 0;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            box-shadow: none;
             position: relative;
-            overflow: hidden;
+            overflow: auto;
             display: flex;
             flex-direction: column;
         }
@@ -310,7 +314,7 @@
                 <div class="author-name">EDWARD SOLOMON KWEKU GYIMAH</div>
                 <div class="author-details">
                     Student ID: SE/DAT/24/0007<br>
-                    Master of Philosophy in Data Science
+                    Master of Philosophy in Data Science Management & Analysis
                 </div>
             </div>
 
