@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>COVID-19 Bibliometric Analysis - Academic Poster</title>
+<style>
+@page { size: 36in 48in; margin: 0; }
+@media print { body { margin: 0; } }
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    background: white;
+    width: 36in;
+    height: 48in;
+    position: relative;
+}
+
+.poster {
+    width: 100%;
+    height: 100%;
+    padding: 1.5in;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #006633 0%, #009944 100%);
+    color: white;
+    padding: 0.8in;
+    border-radius: 0.3in;
+    text-align: center;
+    margin-bottom: 0.5in;
+    box-shadow: 0 0.1in 0.3in rgba(0,0,0,0.2);
+}
+
+.header h1 {
+    font-size: 72pt;
+    margin: 0 0 0.2in 0;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 2pt;
+}
+
+.header .subtitle {
+    font-size: 36pt;
+    margin: 0.2in 0;
+    font-weight: 400;
+    opacity: 0.95;
+}
+
+.authors {
+    font-size: 32pt;
+    margin: 0.3in 0 0.1in 0;
+    font-weight: 600;
+}
+
+.affiliation {
+    font-size: 24pt;
+    font-weight: 400;
+    opacity: 0.9;
+    margin-top: 0.1in;
+}
+
+/* Main Content Grid */
+.content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.4in;
+    margin-bottom: 0.4in;
+}
+
+.section {
+    background: white;
+    padding: 0.4in;
+    border-radius: 0.2in;
+    box-shadow: 0 0.05in 0.15in rgba(0,0,0,0.1);
+    border-left: 0.1in solid #009944;
+}
+
+.section h2 {
+    color: #006633;
+    font-size: 36pt;
+    margin: 0 0 0.2in 0;
+    padding-bottom: 0.15in;
+    border-bottom: 3pt solid #009944;
+    font-weight: 700;
+}
+
+.section h3 {
+    color: #00aa55;
+    font-size: 28pt;
+    margin: 0.2in 0 0.15in 0;
+    font-weight: 600;
+}
+
+.section p, .section ul {
+    font-size: 22pt;
+    line-height: 1.6;
+    margin: 0.1in 0;
+    color: #1f2937;
+}
+
+.section ul {
+    padding-left: 0.4in;
+}
+
+.section li {
+    margin: 0.08in 0;
+}
+
+/* Key Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.2in;
+    margin: 0.2in 0;
+}
+
+.stat-box {
+    background: linear-gradient(135deg, #e6f7ed 0%, #c3e6d1 100%);
+    padding: 0.25in;
+    border-radius: 0.15in;
+    text-align: center;
+    border: 2pt solid #009944;
+}
+
+.stat-number {
+    font-size: 48pt;
+    font-weight: 700;
+    color: #004d26;
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 20pt;
+    color: #475569;
+    margin: 0.05in 0 0 0;
+}
+
+/* Highlights */
+.highlight-box {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    padding: 0.25in;
+    border-radius: 0.15in;
+    border-left: 0.1in solid #f59e0b;
+    margin: 0.15in 0;
+}
+
+.highlight-box strong {
+    color: #92400e;
+    font-size: 24pt;
+}
+
+/* Full Width Sections */
+.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Figures Section */
+.figures {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3in;
+}
+
+.figure-box {
+    background: white;
+    padding: 0.3in;
+    border-radius: 0.2in;
+    box-shadow: 0 0.05in 0.15in rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.figure-box img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.1in;
+    border: 2pt solid #e5e7eb;
+}
+
+.figure-caption {
+    font-size: 20pt;
+    color: #475569;
+    margin-top: 0.15in;
+    font-weight: 600;
+}
+
+/* Footer */
+.footer {
+    background: #006633;
+    color: white;
+    padding: 0.3in;
+    border-radius: 0.2in;
+    text-align: center;
+    margin-top: 0.4in;
+}
+
+.footer p {
+    font-size: 24pt;
+    margin: 0.05in 0;
+}
+
+/* QR Code placeholder */
+.qr-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.3in;
+    margin-top: 0.2in;
+}
+
+.qr-placeholder {
+    width: 2in;
+    height: 2in;
+    background: white;
+    border: 3pt solid #009944;
+    border-radius: 0.1in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18pt;
+    color: #64748b;
+}
+</style>
+</head>
+<body>
+
+<div class="poster">
+    <!-- Header -->
+    <div class="header">
+        <div style="text-align: center; margin-bottom: 0.3in;">
+            <img src="UCC_Logo.png" alt="University of Cape Coast Logo" style="height: 1.5in; width: auto;">
+        </div>
+        <h1>A Comprehensive Bibliometric Analysis of<br>COVID-19 Research Publications</h1>
+        <div class="subtitle">Patterns, Quality, and Global Scientific Response (2020-2024)</div>
+        <div class="authors">
+            Edward Solomon Kweku Gyimah
+        </div>
+        <div class="affiliation">
+            Student ID: SE/DAT/24/0007 • DMA898 Capstone Project<br>
+            Master of Philosophy in Data Science<br>
+            Department of Data Science and Economic Policy, School of Economics<br>
+            University of Cape Coast, Ghana<br>
+            <br>
+            <strong>Supervisor:</strong> Dr. Raymond E. Kofi Nti
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content">
+
+        <!-- Abstract -->
+        <div class="section">
+            <h2>🎯 ABSTRACT</h2>
+            <p><strong>Background:</strong> The COVID-19 pandemic triggered unprecedented scientific research across multiple disciplines.</p>
+
+            <p><strong>Objective:</strong> Examine publication patterns, research quality, journal distribution, and temporal trends in COVID-19 research from 2020-2024.</p>
+
+            <div class="stats-grid" style="margin-top: 0.2in;">
+                <div class="stat-box">
+                    <div class="stat-number">472</div>
+                    <div class="stat-label">Publications<br>Analyzed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">281</div>
+                    <div class="stat-label">Unique<br>Journals</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">97.52</div>
+                    <div class="stat-label">Mean Quality<br>Score</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Years<br>Analyzed</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Methods -->
+        <div class="section">
+            <h2>🔬 METHODS</h2>
+
+            <h3>Data Collection</h3>
+            <ul>
+                <li><strong>Time Period:</strong> January 2020 - December 2024</li>
+                <li><strong>Sample:</strong> 472 peer-reviewed publications</li>
+                <li><strong>Sources:</strong> 281 unique journals</li>
+            </ul>
+
+            <h3>Quality Assessment</h3>
+            <ul>
+                <li>Standardized 100-point scoring system</li>
+                <li>Methodological rigor evaluation</li>
+                <li>Journal impact analysis</li>
+                <li>Reproducibility assessment</li>
+            </ul>
+
+            <h3>Analysis Framework</h3>
+            <ul>
+                <li>Temporal trend analysis</li>
+                <li>Quality distribution assessment</li>
+                <li>Journal clustering patterns</li>
+                <li>Statistical validation</li>
+            </ul>
+        </div>
+
+        <!-- Key Findings -->
+        <div class="section">
+            <h2>📊 KEY FINDINGS</h2>
+
+            <div class="highlight-box">
+                <strong>Exceptional Quality:</strong> 72% of publications rated excellent or exceptional
+            </div>
+
+            <h3>Publication Trends</h3>
+            <ul>
+                <li><strong>2020 Peak:</strong> 163 publications (36%)</li>
+                <li><strong>Progressive Decline:</strong> 2020→2024</li>
+                <li><strong>2024 Volume:</strong> 28 publications (6%)</li>
+            </ul>
+
+            <h3>Quality Evolution</h3>
+            <ul>
+                <li><strong>2020:</strong> Mean = 97.02</li>
+                <li><strong>2024:</strong> Mean = 98.79</li>
+                <li><strong>Trend:</strong> Inverse relationship (volume ↓, quality ↑)</li>
+            </ul>
+
+            <h3>Leading Venues</h3>
+            <ul>
+                <li><strong>NEJM:</strong> 20 publications</li>
+                <li><strong>The Lancet:</strong> 17 publications</li>
+                <li><strong>Nature:</strong> 13 publications</li>
+            </ul>
+        </div>
+
+        <!-- Results Visual 1 -->
+        <div class="section">
+            <h2>📈 PUBLICATION TRENDS</h2>
+            <div class="figure-box">
+                <img src="../FIGURES/Figure2_Annual_Publication_Trends.png" alt="Annual Publication Trends">
+                <div class="figure-caption">Figure 1: Annual Publication Volume (2020-2024)</div>
+            </div>
+            <div class="highlight-box" style="margin-top: 0.2in;">
+                <strong>36% of all publications</strong> occurred in 2020, reflecting rapid scientific response to the pandemic
+            </div>
+        </div>
+
+        <!-- Results Visual 2 -->
+        <div class="section">
+            <h2>📊 QUALITY DISTRIBUTION</h2>
+            <div class="figure-box">
+                <img src="../FIGURES/Figure3_Quality_Score_Distribution.png" alt="Quality Score Distribution">
+                <div class="figure-caption">Figure 2: Quality Score Distribution (n=472)</div>
+            </div>
+            <div class="highlight-box" style="margin-top: 0.2in;">
+                <strong>Range: 94.75-100.0</strong> with remarkably low SD (1.32), indicating consistently high quality
+            </div>
+        </div>
+
+        <!-- Results Visual 3 -->
+        <div class="section">
+            <h2>🔄 QUALITY EVOLUTION</h2>
+            <div class="figure-box">
+                <img src="../FIGURES/Figure4_Annual_Quality_Evolution.png" alt="Quality Evolution">
+                <div class="figure-caption">Figure 3: Annual Quality Score Trends</div>
+            </div>
+            <div class="highlight-box" style="margin-top: 0.2in;">
+                <strong>Inverse relationship:</strong> As publication volumes declined, quality scores improved (r = -0.89)
+            </div>
+        </div>
+
+        <!-- Discussion -->
+        <div class="section full-width" style="grid-column: 1 / 3;">
+            <h2>💡 DISCUSSION & IMPLICATIONS</h2>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3in;">
+                <div>
+                    <h3>Maintained Rigor Despite Pressure</h3>
+                    <p>Scientific community maintained rigorous standards despite unprecedented publication pressure during the pandemic's acute phase.</p>
+
+                    <h3>Inverse Volume-Quality Relationship</h3>
+                    <p>Quality improved as volumes declined, suggesting transition from rapid response to more refined, methodologically sophisticated research.</p>
+                </div>
+
+                <div>
+                    <h3>Broad Disciplinary Engagement</h3>
+                    <p>Distribution across 281 journals indicates extensive interdisciplinary collaboration and diverse perspectives on pandemic research.</p>
+
+                    <h3>Future Health Emergency Preparedness</h3>
+                    <p>Patterns reveal sustainable model for scientific response: rapid initial mobilization followed by quality refinement phase.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conclusions -->
+        <div class="section">
+            <h2>🎯 CONCLUSIONS</h2>
+
+            <ul style="font-size: 24pt;">
+                <li><strong>Exceptional Quality Maintained:</strong> Mean score 97.52/100 across all years</li>
+
+                <li><strong>Distinct Temporal Phases:</strong> Rapid response (2020-2021) → Quality refinement (2022-2024)</li>
+
+                <li><strong>High-Impact Venues:</strong> Leading journals published majority of highly-cited work</li>
+
+                <li><strong>Sustained Excellence:</strong> Quality improved inversely with volume</li>
+
+                <li><strong>Broad Engagement:</strong> 281 journals reflect interdisciplinary approach</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="qr-section">
+            <div>
+                <p style="font-size: 28pt; font-weight: 600; margin-bottom: 0.1in;">📧 Contact Information</p>
+                <p><strong>Edward S. K. Gyimah</strong> (Student): edward.gyimah002@stu.ucc.edu.gh</p>
+                <p><strong>Dr. Raymond E. Kofi Nti</strong> (Supervisor): rkofinti@ucc.edu.gh</p>
+                <p style="margin-top: 0.15in; font-size: 20pt; opacity: 0.9;">Department of Data Science and Economic Policy<br>
+                University of Cape Coast, Ghana • October 2025</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
